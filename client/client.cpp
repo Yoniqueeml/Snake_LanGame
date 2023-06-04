@@ -1,18 +1,9 @@
-#include <stdio.h>
 #include <string.h>   //strlen
 #include <stdlib.h>
-#include <errno.h>
 #include <ncurses.h>
-#include<fstream>
 #include<iostream>
 #include<bits/stdc++.h>
-#include<iostream>
 #include<unistd.h>
-#include<ncurses.h>
-#include <arpa/inet.h>    //close
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
 #include <sys/fcntl.h>
 
@@ -20,36 +11,7 @@
 
 using namespace std ;
 
-//global variables for the program
-int max_x  = 0, max_y = 0;  //Make max_x and max_y as global since the values are used by many methods
-
-
 game GameObj(1) ;
-
-void draw_border_window(int  , int) ;
-void draw_food(void) ;
-
-
-void draw_border_window( int max_x , int max_y){
-    for(int i =0 , j = 1 ; (i<max_x || j<max_y ) ; ){
-        if(i<max_x)
-            mvprintw(1,i++,"--") ;
-
-        if(j<max_y)
-            mvprintw(j++ , 0 , "|") ;
-    }
-
-    max_x -=1 ; max_y-=1 ;
-
-    for(int i =max_x , j = max_y ; (i>0 || j>0) ; ){
-        if(i>0)
-            mvprintw( max_y , i--  , "--") ;
-
-        if(j>0)
-            mvprintw(j--,max_x  , "|") ;
-
-    }
-}
 
 void signalHandler(int code){
     GameObj.initConsoleScreen("off");
@@ -106,8 +68,6 @@ int main(){
     char ch;
 
     input_event buff[5];
-    timeval prevEventTime;
-
     for(;;){
         GameObj.reset_max_screen();
         int r = read(fd, &buff, sizeof(input_event)*5);

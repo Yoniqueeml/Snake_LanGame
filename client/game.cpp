@@ -25,71 +25,70 @@ void game::generateFood(){
     if (!x) x = 2;
     if (!y) y = 2;
     coloron(RED);
-    mvprintw(y, x,"#");
+    mvprintw(y, x,"@");
     coloroff(RED);
     setFoodPos(x , y);
 }
 
-void game::setMainSnakePtr(snake * ptr) {
+void game::setMainSnakePtr(snake* ptr){
     mainSnakePtr = ptr;
 }
 
 void game::printFood(string status){
-    if(status=="new")
+    if (status=="new")
         generateFood();
 
-    if(!getFoodX() && !getFoodY())
+    if (!getFoodX() && !getFoodY())
         generateFood();
     coloron(RED);
-    mvprintw(foodObj.getY(), foodObj.getX() ,"#");
+    mvprintw(foodObj.getY(), foodObj.getX(), "@");
     coloroff(RED);
 }
 
-void game::printAnimated(string msg  , int speed = 6000){
-    for(int c = 0  ; msg[c] ; c++){
-        cout<<msg[c] ;
-        cout.flush() ;
-        usleep(speed) ;
+void game::printAnimated(string msg, int speed = 6000){
+    for (int c = 0; msg[c]; c++){
+        cout << msg[c];
+        cout.flush();
+        usleep(speed);
     }
 }
 
 void game::initColors(){
-    init_pair(RED , COLOR_RED , COLOR_BLACK) ;
-    init_pair(YELLOW , COLOR_YELLOW , COLOR_BLACK) ;
-    init_pair(GREEN , COLOR_GREEN , COLOR_BLACK) ;
-    init_pair(WHITE , COLOR_WHITE , COLOR_BLACK) ;
-    init_pair(MAGENTA, COLOR_MAGENTA, COLOR_BLACK) ;
-    init_pair(BLUE, COLOR_BLUE, COLOR_BLACK) ;
-    init_pair(CYAN , COLOR_CYAN , COLOR_BLACK) ;
+    init_pair(RED, COLOR_RED, COLOR_BLACK);
+    init_pair(YELLOW, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair(MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair(CYAN, COLOR_CYAN, COLOR_BLACK);
 }
 
-void game::setFoodPos(int x, int y) {
+void game::setFoodPos(int x, int y){
     foodObj.setX(x);
     foodObj.setY(y);
 }
 
 void game::handleMessageFromServer(string msg){
-    if(msg.find(":")!=string::npos){
-        int start_colon = msg.find(":") ;
+    if (msg.find(":") != string::npos){
+        int start_colon = msg.find(":");
 
-        int camma = msg.find(",") ;
-        string str_x = msg.substr(start_colon+1 , camma-1) ;
-        string str_y = msg.substr(camma+1 , 3) ;
+        int camma = msg.find(",");
+        string str_x = msg.substr(start_colon + 1 , camma - 1);
+        string str_y = msg.substr(camma+1, 3);
 
-        int x  = stoi(str_x)  , y = stoi(str_y) ;
+        int x  = stoi(str_x), y = stoi(str_y);
 
-        setFoodPos(x , y) ;
+        setFoodPos(x, y);
     }
 
     //Handle game over message sent from server
-    if(msg.find("$")!=string::npos){
-        int start = msg.find("$") ;
-        string num="" ;
-        for(int i = start+1 ; msg[i]!='$' ; i++)
-        {
-            num+=msg[i] ;
+    if (msg.find("$")!=string::npos){
+        int start = msg.find("$");
+        string num = "";
+        for (int i = start + 1; msg[i] != '$'; i++){
+            num += msg[i];
         }
-        mainSnakePtr->setScore(stoi(num)) ;
+        mainSnakePtr->setScore(stoi(num));
         gameOverHandler(*mainSnakePtr);
     }
 }
@@ -107,7 +106,7 @@ int game::getCenterX(){
 }
 
 int game::getCenterY(){
-    return center_y ;
+    return center_y;
 }
 
 food game::getFoodPos(){
@@ -120,34 +119,33 @@ int game::getNoOfPlayers(){
 }
 
 void game::reset_max_screen(){
-    getmaxyx(stdscr , maxY , maxX ) ;
+    getmaxyx(stdscr, maxY, maxX);
 }
 
 void game::setNoOfPlayers(int n){
     noOfPlayers  = n;
 }
 
-//Initialise the console with the decision to turn off or on the enter key and cursor
 void game::initConsoleScreen(string state){
     if(state=="on"){
-        initscr() ; //Init screen
-        noecho() ; // Dont show any pressed char
-        curs_set(false) ; // Don't show the cursor
-        start_color() ;
-        getmaxyx(stdscr , maxY , maxX) ;
-        center_x = maxX/2  , center_y = maxY/2 ;
-        cbreak() ; //Dont wait for enter to be pressed when using getch
-        nodelay(stdscr , 1) ;  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
+        initscr(); //Init screen
+        noecho(); // Dont show any pressed char
+        curs_set(false); // Don't show the cursor
+        start_color();
+        getmaxyx(stdscr, maxY, maxX);
+        center_x = maxX / 2, center_y = maxY / 2;
+        cbreak(); //Dont wait for enter to be pressed when using getch
+        nodelay(stdscr, 1);  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
     }
 
-    else if(state=="off"){
-        clear() ;
-        flushinp() ;
-        fflush(stdin) ;
-        use_default_colors() ;
-        endwin() ;
-        cout.flush() ;
-        system("clear") ;
+    else if(state == "off"){
+        clear();
+        flushinp();
+        fflush(stdin);
+        use_default_colors();
+        endwin();
+        cout.flush();
+        system("clear");
     }
 }
 
@@ -160,34 +158,34 @@ void game::gameOverHandler(const snake& snk){
     clear();
     initConsoleScreen("off");
     system("clear");
-    string gameovermessage = "\n\n\nGAME OVER " + snk.getName()+" :(\n\n";
-    gameovermessage+="Score : "+std::to_string(snk.getScore())+"\n";
-    gameovermessage+="\n\nPress ctrl+c to exit.";
+    string gameovermessage = "\n\n\nGAME OVER " + snk.getName() + " :(\n\n";
+    gameovermessage += "Score : " + std::to_string(snk.getScore()) + "\n";
+    gameovermessage += "\n\nPress ctrl+c to exit.";
     printAnimated(gameovermessage);
     sock_obj.closeSocket();
     sleep(5000);
 }
 
 void game::printScore(const snake& snk, string pos){
-    if (pos=="right")
-        mvprintw(0 , 15, "Score = %d" , snk.getScore()) ;
-    mvprintw(0 , 0 , "Score = %d" , snk.getScore()) ;
+    if (pos == "right")
+        mvprintw(0, 15, "Score = %d", snk.getScore());
+    mvprintw(0, 0, "Score = %d", snk.getScore());
 }
 
 void game::draw_snake(const snake& snk){
     int i;
     coloron(snk.getBodyColor());
     for(i =0; i < snk.getParts().size() - 1; i++){
-        mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX() , "o");
+        mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "o");
     }
     coloroff(snk.getBodyColor());
-    mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX() , "+");
+    mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "+");
 }
 
 void game::init_snake_on_screen(snake& snk){
     snk.add_part(getCenterX(), getCenterY());
-    snk.add_part(getCenterX() + 1 , getCenterY());
-    snk.add_part(getCenterX() + 2 ,getCenterY());
+    snk.add_part(getCenterX() + 1, getCenterY());
+    snk.add_part(getCenterX() + 2,getCenterY());
 
     draw_snake(snk);
 }
@@ -214,32 +212,44 @@ void game::move_snake(snake& snk, int direction){
         snk.setDirection(3);
     }
 
-    check_snake_overlap(snk) ;
+    check_snake_overlap(snk);
 
     if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
-        snk.add_part(getFoodX(), getFoodY() ) ;
-        snk.setScore(snk.getScore() + 1) ;
-        sock_obj.sendData("#") ;
+        snk.add_part(getFoodX(), getFoodY());
+        snk.setScore(snk.getScore() + 1);
+        sock_obj.sendData("#");
 
-        setFoodPos(-10 , -10) ;
+        setFoodPos(-10, -10);
     }
     draw_snake(snk);
-    refresh() ;
+    refresh();
 }
 
 void game::handleMovementKeyPress(snake& snk, const int code){
-    if(code==17 || code == 103){ if (snk.getDirection() != 3 && snk.getDirection() != 1) move_snake(snk, 1); }
-    else if(code==31 || code==108){ if (snk.getDirection() != 1 && snk.getDirection() != 3) move_snake(snk, 3); }
-    else if(code==30 || code==106){ if (snk.getDirection() != 0 && snk.getDirection() != 2) move_snake(snk, 2); }
-    else if(code==32 || code==105){ if (snk.getDirection() != 2 && snk.getDirection() != 0) move_snake(snk, 0); }
-    else return ;
+    if(code==17 || code == 103){
+        if (snk.getDirection() != 3 && snk.getDirection() != 1)
+            move_snake(snk, 1);
+    }
+    else if(code==31 || code==108){
+        if (snk.getDirection() != 1 && snk.getDirection() != 3)
+            move_snake(snk, 3);
+    }
+    else if(code==30 || code==106){
+        if (snk.getDirection() != 0 && snk.getDirection() != 2)
+            move_snake(snk, 2);
+    }
+    else if(code==32 || code==105){
+        if (snk.getDirection() != 2 && snk.getDirection() != 0)
+            move_snake(snk, 0);
+    }
+    else return;
 }
 
 void game::check_snake_overlap(snake& snk){
     int headX = snk.getHeadX(), headY  = snk.getHeadY();
-    for(int i =0; i < snk.getParts().size() - 1; i++)
-        if(snk.getPart(i).getX()==headX && snk.getPart(i).getY() == headY){
-            if(socket_descriptor > 0)
+    for (int i = 0; i < snk.getParts().size() - 1; i++)
+        if (snk.getPart(i).getX() == headX && snk.getPart(i).getY() == headY){
+            if (socket_descriptor > 0)
                 return;
             gameOverHandler(snk);
         }
@@ -253,11 +263,11 @@ void game::readData(){
     val = select(sock_obj.getSock() + 1, &sock_obj.getSet(), NULL, NULL, &sock_obj.getTimeout());
 
     if(val > 0){
-        recv(sock_obj.getSock() , sock_obj.getBuffer(), 1024, 0);
-        handleMessageFromServer(string(sock_obj.getBuffer())) ;
+        recv(sock_obj.getSock(), sock_obj.getBuffer(), 1024, 0);
+        handleMessageFromServer(string(sock_obj.getBuffer()));
     }
 
     else if(val == -1){
-        perror("select") ;
+        perror("select");
     }
 }

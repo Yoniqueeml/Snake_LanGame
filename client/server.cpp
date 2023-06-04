@@ -1,20 +1,20 @@
 #include "server.h"
 
 SocketHandler::SocketHandler(){
-    sock = 0  ;
+    sock = 0;
     memset(&serv_addr, '0', sizeof(serv_addr));
-    memset(buffer , 0 ,sizeof(buffer)) ;
-    timeout.tv_sec = timeout.tv_usec = 0 ;
+    memset(buffer, 0,sizeof(buffer));
+    timeout.tv_sec = timeout.tv_usec = 0;
 }
 
 void SocketHandler::sendData(string message){
-    send(sock , message.c_str() , message.length() , 0 );
+    send(sock, message.c_str(), message.length(), 0);
 }
 
 //creates and assigns the fd value to sock member
 void SocketHandler::createClientSocket(){
-    int opt= 1 ;
-    sock = socket(AF_INET , SOCK_STREAM , 0) ;
+    int opt= 1;
+    sock = socket(AF_INET, SOCK_STREAM, 0);
     FD_ZERO(&set); /* clear the set */
     FD_SET(sock, &set); /* add our file descriptor to the set */
 
@@ -22,13 +22,13 @@ void SocketHandler::createClientSocket(){
         printf("\n Socket creation error \n");
     }
 
-    if (setsockopt(sock , SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
 }
 
-void SocketHandler::initServerAddress(string address, int port ){
+void SocketHandler::initServerAddress(string address, int port){
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
@@ -59,7 +59,7 @@ int SocketHandler::connectToServer(string address, int port) {
 }
 
 void SocketHandler::closeSocket(){
-    close(sock) ;
+    close(sock);
 }
 
 int SocketHandler::getSock() const{

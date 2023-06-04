@@ -4,11 +4,11 @@
 #define coloroff(a) attroff(COLOR_PAIR(a))
 
 int snake::getHeadX() const{
-    return parts.at(parts.size()-1).getX();
+    return parts.at(parts.size() - 1).getX();
 }
 
 int snake::getHeadY() const{
-    return parts.at(parts.size()-1).getY();
+    return parts.at(parts.size() - 1).getY();
 }
 
 int snake::getDirection() const{
