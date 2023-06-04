@@ -1,44 +1,35 @@
 #include "server.h"
 
-void socketHandler:: initServerSocket()
-{
-    //create a master socket
-    if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0)
-    {
+void socketHandler:: initServerSocket(){
+    if ((master_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
     //set master socket to allow multiple connections ,
-    if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,
-                   sizeof(opt)) < 0 )
-    {
+    if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,
+                   sizeof(opt)) < 0){
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
-
 }
 
-void  socketHandler::bindServer()
-{
-    initServerSocket() ;
-
+void  socketHandler::bindServer(){
+    initServerSocket();
     //type of socket created
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( PORT );
 
     //bind the socket to localhost port 8888
-    if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0)
-    {
+    if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0){
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
 }
 
 
-void socketHandler::setupClientDescriptors()
-{
+void socketHandler::setupClientDescriptors(){
     //clear the socket set
     FD_ZERO(&readfds);
 
@@ -47,8 +38,7 @@ void socketHandler::setupClientDescriptors()
     max_sd = master_socket;
 
     //add child sockets to set
-    for ( i = 0 ; i < max_clients ; i++)
-    {
+    for (i = 0; i < max_clients; i++){
         //socket descriptor
         sd = client_socket[i];
 
@@ -60,41 +50,35 @@ void socketHandler::setupClientDescriptors()
         if(sd > max_sd)
             max_sd = sd;
     }
-
 }
 
 
-void socketHandler::startServer()
-{
+void socketHandler::startServer(){
     //try to specify maximum of 3 pending connections for the master socket
-    if (listen(master_socket, 3) < 0)
-    {
+    if (listen(master_socket, 3) < 0){
         perror("listen");
         exit(EXIT_FAILURE);
     }
 
-    //accept the incoming connection
     addrlen = sizeof(address);
     puts("Waiting for connections ...");
-
 }
 
 
 //initialise all client_socket[] to 0 so not checked
-socketHandler::socketHandler(void)
-{
-    max_clients = 30 ;
-    valread = 0 ;
-    PORT = 8888 ;
-    opt = true ;
+socketHandler::socketHandler(){
+    max_clients = 30;
+    valread = 0;
+    PORT = 8888;
+    opt = true;
 
-    timeout.tv_sec = timeout.tv_usec = 0 ;
+    timeout.tv_sec = timeout.tv_usec = 0;
 
     //initialise all client_socket[] to 0 so not checked
-    memset(client_socket , 0 , sizeof(client_socket)) ;
+    memset(client_socket, 0, sizeof(client_socket));
     memset(&address, '0', sizeof(address));
-    memset(buffer , 0 ,sizeof(buffer)) ;
-    strcpy(message , "Successfully Connected  \r\n") ;
+    memset(buffer, 0,sizeof(buffer));
+    strcpy(message, "Successfully Connected  \r\n");
 }
 
 

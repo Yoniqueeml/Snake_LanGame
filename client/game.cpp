@@ -191,7 +191,6 @@ void game::init_snake_on_screen(snake& snk){
 }
 
 void game::move_snake(snake& snk, int direction){
-
     snk.getParts().erase(snk.getParts().begin());
     snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
 

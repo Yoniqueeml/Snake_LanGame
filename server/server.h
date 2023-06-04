@@ -1,7 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
-
-#include <stdio.h> 
+#include <stdio.h>
 #include <string.h>   //strlen 
 #include <stdlib.h> 
 #include <errno.h> 
@@ -16,38 +13,29 @@
 #include <ncurses.h>
 
 class socketHandler{
-
-    int opt ;  
-    int master_socket , PORT , addrlen , new_socket , client_socket[30] , 
-          max_clients , activity, i , valread , sd;  
-    int max_sd;  
-    struct sockaddr_in address;  
-    char message[50] ; 
-    struct timeval timeout; 
+    int opt;
+    int master_socket, PORT, addrlen, new_socket, client_socket[30],
+          max_clients, activity, i, valread, sd;
+    int max_sd;
+    struct sockaddr_in address;
+    char message[50];
+    struct timeval timeout;
         
     char buffer[1025];  //data buffer of 1K 
     fd_set readfds;
 
-    void initServerSocket() ; 
-       
+    void initServerSocket() ;
 
-    public : 
-
-    socketHandler(void) ; 
-    void bindServer() ; 
-    // void handleActivity() ; 
-    std::vector<int> handleActivity() ; 
-    void setupClientDescriptors() ; 
-    void startServer() ; 
-    void stopServer() ; 
-    void sendData(int , std::string) ; 
-    int checkClientActiviy() ; 
-    void closeSocket(int ) ; 
-    int handleNewConnection() ; 
-    std::string handleIOActivity(int) ; 
-
-    
+public:
+    socketHandler();
+    void bindServer();
+    std::vector<int> handleActivity();
+    void setupClientDescriptors();
+    void startServer();
+    void stopServer();
+    void sendData(int, std::string);
+    int checkClientActiviy();
+    void closeSocket(int);
+    int handleNewConnection();
+    std::string handleIOActivity(int);
 };
-
-#endif // !1SE SERVER_H
-
