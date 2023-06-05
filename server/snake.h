@@ -9,18 +9,18 @@ class snake{
 private:
     vector <snake_part> parts;
     int snakeDirection;
-    string player_name;
-    int score, id, bodycolor;
-    int socket_descriptor;
+    string playerName;
+    int score, id, bodyColor;
+    int socketDescriptor;
 
 public:
     snake(int snakeid, int socket_descriptor, string name="Name"){
         score = 0;
         snakeDirection = 2;
         id = snakeid;
-        player_name = name;
-        this->socket_descriptor = socket_descriptor;
-        bodycolor = rand() % 5 + 1;
+        playerName = name;
+        this->socketDescriptor = socket_descriptor;
+        bodyColor = rand() % 5 + 1;
     }
 
     int getHeadX() const;
@@ -33,7 +33,7 @@ public:
     int getBodyColor() const;
     void setBodyColor(int);
     int setScore(int s);
-    void add_part(int, int);
+    void addPart(int, int);
     const vector<snake_part>& getParts() const;
     vector<snake_part>& getParts();
     snake_part& getPart(const int);

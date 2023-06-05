@@ -9,7 +9,7 @@ using namespace std;
 
 class SocketHandler{
     struct sockaddr_in address;
-    struct sockaddr_in serv_addr;
+    struct sockaddr_in servAddr;
     int sock;
     char buffer[1024];
     fd_set set;

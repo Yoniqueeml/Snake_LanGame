@@ -1,4 +1,3 @@
-
 class snake_part{
     int x, y;
 public:

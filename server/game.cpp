@@ -25,7 +25,7 @@ void game::generateFood(){
     coloroff(RED);
     setFoodPos(x, y);
 
-    LAN_sendFoodCoordinates( getFoodX(), getFoodY());
+    LANSendFoodCoordinates( getFoodX(), getFoodY());
 }
 
 void game::printFood(string status){
@@ -71,11 +71,11 @@ int game::getFoodY(){
 }
 
 int game::getCenterX(){
-    return center_x;
+    return centerX;
 }
 
 int game::getCenterY(){
-    return center_y;
+    return centerY;
 }
 
 food game::getFoodPos(){
@@ -91,7 +91,7 @@ int game::getNoOfPlayers(){
     return noOfPlayers;
 }
 
-void game::reset_max_screen(){
+void game::resetMaxScreen(){
     getmaxyx(stdscr, maxY, maxX);
 }
 
@@ -106,7 +106,7 @@ void game::initConsoleScreen(string state){
         curs_set(false); // Don't show the cursor
         start_color();
         getmaxyx(stdscr, maxY, maxX);
-        center_x = maxX / 2, center_y = maxY / 2;
+        centerX = maxX / 2, centerY = maxY / 2;
         cbreak(); //Dont wait for enter to be pressed when using getch
         nodelay(stdscr, 1);  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
     }
@@ -122,86 +122,86 @@ void game::initConsoleScreen(string state){
     }
 }
 
-void game::init_snake_on_screen(snake& snk){
-    snk.add_part(getCenterX(), getCenterY());
-    snk.add_part(getCenterX() + 1, getCenterY());
-    snk.add_part(getCenterX() + 2, getCenterY());
+void game::initSnakeOnScreen(snake& snk){
+    snk.addPart(getCenterX(), getCenterY());
+    snk.addPart(getCenterX() + 1, getCenterY());
+    snk.addPart(getCenterX() + 2, getCenterY());
 
-    draw_snake(snk);
+    drawSnake(snk);
 }
 
-void game::move_snake(snake& snk, int direction){
+void game::moveSnake(snake& snk, int direction){
 
     snk.getParts().erase(snk.getParts().begin());
     snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
 
     if(direction == 2){
-        snk.add_part((last_part.getX() + 1) % maxX, last_part.getY());
+        snk.addPart((last_part.getX() + 1) % maxX, last_part.getY());
         snk.setDirection(2);
     }
     else if(direction == 0){
-        snk.add_part((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
+        snk.addPart((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
         snk.setDirection(0);
     }
     else if(direction == 1){
-        snk.add_part(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
+        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
         snk.setDirection(1);
     }
     else if(direction == 3){
-        snk.add_part(last_part.getX(), (last_part.getY() + 1) % maxY);
+        snk.addPart(last_part.getX(), (last_part.getY() + 1) % maxY);
         snk.setDirection(3);
     }
 
-    check_snake_overlap(snk);
+    checkSnakeOverlap(snk);
 
     if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
-        snk.add_part(getFoodX(), getFoodY());
+        snk.addPart(getFoodX(), getFoodY());
         snk.setScore(snk.getScore() + 1);
         printFood("new");
     }
-    draw_snake(snk);
+    drawSnake(snk);
     refresh();
 }
 
 void game::moveAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
-        move_snake(allSnakes[i], allSnakes[i].getDirection());
+        moveSnake(allSnakes[i], allSnakes[i].getDirection());
     }
 }
 
 void game::handleMovementKeyPress(snake& snk, const int code){
     if(code == 17 || code == 103){
         if (snk.getDirection() != 3 && snk.getDirection() != 1)
-            move_snake(snk, 1);
+            moveSnake(snk, 1);
     }
     else if(code == 31 || code == 108){
         if (snk.getDirection() != 1 && snk.getDirection() != 3)
-            move_snake(snk, 3);
+            moveSnake(snk, 3);
     }
     else if(code == 30 || code == 106){
         if (snk.getDirection() != 0 && snk.getDirection() != 2)
-            move_snake(snk, 2);
+            moveSnake(snk, 2);
     }
     else if(code == 32 || code == 105){
         if (snk.getDirection() != 2 && snk.getDirection() != 0)
-            move_snake(snk, 0);
+            moveSnake(snk, 0);
     }
     else return;
 }
 
-void game::check_snake_overlap(snake& snk){
+void game::checkSnakeOverlap(snake& snk){
     int headX = snk.getHeadX(), headY  = snk.getHeadY();
     for (int i = 0; i < snk.getParts().size() - 1; i++)
         if (snk.getPart(i).getX() == headX && snk.getPart(i).getY() == headY){
-            if (socket_descriptor > 0)
+            if (socketDescriptor > 0)
                 return;
-            server.sendData(socket_descriptor , "$" + std::to_string(snk.getScore()) + "$");
+            server.sendData(socketDescriptor , "$" + std::to_string(snk.getScore()) + "$");
             gameOverHandler(snk);
         }
 }
 
 int game::getSnakeIndexFromID(int id){
-    for(int i = 0; i < allSnakes.size(); i++){
+    for (int i = 0; i < allSnakes.size(); i++){
         if (allSnakes[i].getId() == id)
             return i;
     }
@@ -212,7 +212,7 @@ void game::printScores(){
     int s  = 0;
     string temp;
     coloron(WHITE);
-    for(int i = 0; i < allSnakes.size(); i++){
+    for (int i = 0; i < allSnakes.size(); i++){
         temp = allSnakes[i].getName();
         mvprintw(0 , s, "%s:%d", temp.c_str(), allSnakes[i].getScore());
         s += temp.length() + 4;
@@ -229,9 +229,9 @@ void game::gameOverHandler(const snake& snk){
 
     printAnimated(gameovermessage);
 
-    if (socket_descriptor > 0){
-        allSnakes.erase(allSnakes.begin() + getSnakeIndexFromDescriptor(socket_descriptor));
-        server.closeSocket(socket_descriptor);
+    if (socketDescriptor > 0){
+        allSnakes.erase(allSnakes.begin() + getSnakeIndexFromDescriptor(socketDescriptor));
+        server.closeSocket(socketDescriptor);
     }
     else
         allSnakes.erase(allSnakes.begin() + getSnakeIndexFromID(snk.getId()));
@@ -249,7 +249,7 @@ void game::gameOverHandler(const snake& snk){
     sleep(1);
 }
 
-void game::draw_snake(snake& snk){
+void game::drawSnake(snake& snk){
     int i;
     coloron(snk.getBodyColor());
     for(i =0; i < snk.getParts().size() - 1; i++){
@@ -259,16 +259,16 @@ void game::draw_snake(snake& snk){
     mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "+");
 }
 
-void game::draw_all_snakes(){
-    for(int i =0; i<allSnakes.size(); i++){
-        allSnakes[i].add_part(center_x + 5 , center_y);
-        allSnakes[i].add_part(center_x + 6 , center_y);
-        allSnakes[i].add_part(center_x + 7 , center_y);
-        draw_snake(allSnakes[i]);
+void game::drawAllSnakes(){
+    for (int i = 0; i < allSnakes.size(); i++){
+        allSnakes[i].addPart(centerX + 5 , centerY);
+        allSnakes[i].addPart(centerX + 6 , centerY);
+        allSnakes[i].addPart(centerX + 7 , centerY);
+        drawSnake(allSnakes[i]);
     }
 }
 
-void game::LAN_sendFoodCoordinates(int x, int y){
+void game::LANSendFoodCoordinates(int x, int y){
     for (int temp= 0; temp < allSnakes.size(); temp++){
         int sd  = allSnakes[temp].getSocketDescriptor();
 
@@ -292,9 +292,9 @@ void game::handleNewConnection(){
     allSnakes.push_back(*clientSnakePtr);
     setNoOfPlayers(getNoOfPlayers() + 1);
 
-    allSnakes[allSnakes.size() - 1].add_part(center_x + 5, center_y);
-    allSnakes[allSnakes.size() - 1].add_part(center_x + 6, center_y);
-    allSnakes[allSnakes.size() - 1].add_part(center_x + 7, center_y);
+    allSnakes[allSnakes.size() - 1].addPart(centerX + 5, centerY);
+    allSnakes[allSnakes.size() - 1].addPart(centerX + 6, centerY);
+    allSnakes[allSnakes.size() - 1].addPart(centerX + 7, centerY);
     generateFood();
 }
 
@@ -330,7 +330,7 @@ void game::handleIOActivity(){
 
 
         else if(msg.find("init~~") != string::npos){
-            LAN_sendFoodCoordinates(foodObj.getX() , foodObj.getY()) ;
+            LANSendFoodCoordinates(foodObj.getX() , foodObj.getY()) ;
             string name="", sight="";
             int pos = msg.find("init~~");
             int i;
@@ -360,14 +360,14 @@ void game::handleIOActivity(){
         else{
             for(int c = 0; c < msg.length(); c++){
                 if (msg[c]=='#') {
-                    allSnakes[snake_index].add_part(allSnakes[snake_index].getHeadX(),
+                    allSnakes[snake_index].addPart(allSnakes[snake_index].getHeadX(),
                                                     allSnakes[snake_index].getHeadY());
                     allSnakes[snake_index].setScore(allSnakes[snake_index].getScore() + 1);
 
                     syncSnakeWithClient(allSnakes[snake_index]);
 
                     printFood("new");
-                    LAN_sendFoodCoordinates(getFoodX(), getFoodY());
+                    LANSendFoodCoordinates(getFoodX(), getFoodY());
                 }
                 else if(msg[c] == 'A' or msg[c] == 'B' or msg[c] == 'C' or msg[c] == 'D') {
                     int code = 0;

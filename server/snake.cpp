@@ -29,18 +29,18 @@ int snake::getId() const {
 
 
 int snake::getSocketDescriptor() const {
-    return socket_descriptor;
+    return socketDescriptor;
 }
 
 int snake::getBodyColor() const{
-    return bodycolor;
+    return bodyColor;
 }
 
 void snake::setBodyColor(int color) {
-    bodycolor = color;
+    bodyColor = color;
 }
 
-void snake::add_part(int x , int y){
+void snake::addPart(int x , int y){
     snake_part obj(x , y) ;
     parts.push_back(obj);
 }
@@ -64,9 +64,9 @@ snake_part& snake::getPart(const int i){
 
 
 string snake::getName() const{
-    return player_name;
+    return playerName;
 }
 
 void snake::setName(string name){
-    this->player_name = name;
+    this->playerName = name;
 }

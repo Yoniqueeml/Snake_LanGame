@@ -20,7 +20,7 @@ void signalHandler(int code){
     exit(1) ;
 }
 
-struct input_event {
+struct inputEvent {
     struct timeval time;
     unsigned short type;
     unsigned short code;
@@ -61,12 +61,12 @@ int main(){
     GameObj.initConsoleScreen("on");
     GameObj.initColors();
 
-    GameObj.init_snake_on_screen(first_snake);
+    GameObj.initSnakeOnScreen(first_snake);
 
-    input_event buff[5];
+    inputEvent buff[5];
     while(true){
-        GameObj.reset_max_screen();
-        int r = read(fd, &buff, sizeof(input_event)*5);
+        GameObj.resetMaxScreen();
+        int r = read(fd, &buff, sizeof(inputEvent)*5);
         if (r > 0) {
             for (int i = 0; i < 5; ++i) {
                 if (buff[i].type == 1 && buff[i].value == 1) {
@@ -82,10 +82,10 @@ int main(){
                 }
             }
         }
-        memset(buff, 0, sizeof(input_event) * 5);
+        memset(buff, 0, sizeof(inputEvent) * 5);
         flushinp();
         clear() ;
-        GameObj.move_snake(first_snake, first_snake.getDirection()) ;
+        GameObj.moveSnake(first_snake, first_snake.getDirection()) ;
         GameObj.printFood("old") ;
         GameObj.printScore(first_snake);
 

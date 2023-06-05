@@ -1,12 +1,12 @@
 #include "server.h"
 
 void socketHandler:: initServerSocket(){
-    if ((master_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0){
+    if ((masterSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    if (setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,
+    if (setsockopt(masterSocket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,
                    sizeof(opt)) < 0){
         perror("setsockopt");
         exit(EXIT_FAILURE);
@@ -20,7 +20,7 @@ void  socketHandler::bindServer(){
     address.sin_port = htons( PORT );
 
     //bind the socket to localhost port 8888
-    if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0){
+    if (bind(masterSocket, (struct sockaddr *)&address, sizeof(address))<0){
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
@@ -32,27 +32,27 @@ void socketHandler::setupClientDescriptors(){
     FD_ZERO(&readfds);
 
     //add master socket to set
-    FD_SET(master_socket, &readfds);
-    max_sd = master_socket;
+    FD_SET(masterSocket, &readfds);
+    maxSd = masterSocket;
 
     //add child sockets to set
-    for (i = 0; i < max_clients; i++){
+    for (i = 0; i < maxClients; i++){
         //socket descriptor
-        sd = client_socket[i];
+        sd = clientSocket[i];
 
         //if valid socket descriptor then add to read list
         if(sd > 0)
             FD_SET( sd , &readfds);
 
         //highest file descriptor number, need it for the select function
-        if(sd > max_sd)
-            max_sd = sd;
+        if(sd > maxSd)
+            maxSd = sd;
     }
 }
 
 
 void socketHandler::startServer(){
-    if (listen(master_socket, 3) < 0){
+    if (listen(masterSocket, 3) < 0){
         perror("listen");
         exit(EXIT_FAILURE);
     }
@@ -63,14 +63,14 @@ void socketHandler::startServer(){
 
 
 socketHandler::socketHandler(){
-    max_clients = 30;
+    maxClients = 30;
     valread = 0;
     PORT = 8888;
     opt = true;
 
     timeout.tv_sec = timeout.tv_usec = 0;
 
-    memset(client_socket, 0, sizeof(client_socket));
+    memset(clientSocket, 0, sizeof(clientSocket));
     memset(&address, '0', sizeof(address));
     memset(buffer, 0,sizeof(buffer));
     strcpy(message, "Successfully Connected  \r\n");
@@ -80,9 +80,9 @@ socketHandler::socketHandler(){
 
 
 int socketHandler::checkClientActiviy(){
-    setupClientDescriptors() ;
+    setupClientDescriptors();
 
-    activity = select( max_sd + 1, &readfds, NULL, NULL, &timeout);
+    activity = select( maxSd + 1, &readfds, NULL, NULL, &timeout);
 
     if ((activity < 0) && (errno!=EINTR)){
         printf("select error\n");
@@ -94,31 +94,31 @@ int socketHandler::checkClientActiviy(){
 
 void socketHandler::closeSocket(int sd){
     close(sd);
-    for(int i = 0; i < max_clients; i++){
-        if(client_socket[i] == sd){
-            client_socket[i] = 0;
+    for (int i = 0; i < maxClients; i++){
+        if(clientSocket[i] == sd){
+            clientSocket[i] = 0;
         }
     }
 }
 
 void socketHandler::stopServer(){
-    close(master_socket);
+    close(masterSocket);
 }
 
 int socketHandler:: handleNewConnection(){
-    if ((new_socket = accept(master_socket,
-                             (struct sockaddr *)&address, (socklen_t*)&addrlen))<0){
+    if ((newSocket = accept(masterSocket,
+                             (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0){
         perror("accept");
         exit(EXIT_FAILURE);
     }
 
-    for (i = 0; i < max_clients; i++){
-        if (client_socket[i] == 0 ){
-            client_socket[i] = new_socket;
+    for (i = 0; i < maxClients; i++){
+        if (clientSocket[i] == 0){
+            clientSocket[i] = newSocket;
             break;
         }
     }
-    return new_socket ;
+    return newSocket;
 }
 
 
@@ -129,9 +129,9 @@ std::string socketHandler::handleIOActivity(int client_sd){
 
         //Close the socket and mark as 0 in list for reuse
         close( client_sd );
-        for (int i = 0; i < max_clients; i++){
-            if (client_socket[i] == client_sd)
-                client_socket[i] = 0;
+        for (int i = 0; i < maxClients; i++){
+            if (clientSocket[i] == client_sd)
+                clientSocket[i] = 0;
         }
         return "" ;
     }
@@ -150,14 +150,14 @@ void socketHandler::sendData(int client_sd , std::string msg){
 
 std::vector<int> socketHandler::handleActivity(){
     std::vector<int> descriptors;
-    if (FD_ISSET(master_socket, &readfds)){
+    if (FD_ISSET(masterSocket, &readfds)){
         descriptors.push_back(-1);
     }
 
     else{
         //else its some IO operation on some other socket
-        for (i = 0; i < max_clients; i++){
-            sd = client_socket[i];
+        for (i = 0; i < maxClients; i++){
+            sd = clientSocket[i];
 
             if (FD_ISSET( sd , &readfds)){
                 descriptors.push_back(sd);

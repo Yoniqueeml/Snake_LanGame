@@ -19,7 +19,7 @@ void HANDLE_EVERYTHING_TILL_EVENT_LOOP(){
     system("clear");
     GameObj.setNoOfPlayers(0);
 
-    GameObj.draw_all_snakes();
+    GameObj.drawAllSnakes();
 }
 
 
@@ -58,7 +58,7 @@ int main(int argc , char * argv[]){
     GameObj.initServerForMultiplayer();
 
     while(true){
-        GameObj.reset_max_screen();
+        GameObj.resetMaxScreen();
         activity = GameObj.checkClientActivity();
 
         if (activity >= 1){

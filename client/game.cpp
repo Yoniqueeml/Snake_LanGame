@@ -102,11 +102,11 @@ int game::getFoodY(){
 }
 
 int game::getCenterX(){
-    return center_x;
+    return centerX;
 }
 
 int game::getCenterY(){
-    return center_y;
+    return centerY;
 }
 
 food game::getFoodPos(){
@@ -118,7 +118,7 @@ int game::getNoOfPlayers(){
     return noOfPlayers;
 }
 
-void game::reset_max_screen(){
+void game::resetMaxScreen(){
     getmaxyx(stdscr, maxY, maxX);
 }
 
@@ -133,7 +133,7 @@ void game::initConsoleScreen(string state){
         curs_set(false); // Don't show the cursor
         start_color();
         getmaxyx(stdscr, maxY, maxX);
-        center_x = maxX / 2, center_y = maxY / 2;
+        centerX = maxX / 2, centerY = maxY / 2;
         cbreak(); //Dont wait for enter to be pressed when using getch
         nodelay(stdscr, 1);  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
     }
@@ -150,11 +150,11 @@ void game::initConsoleScreen(string state){
 }
 
 SocketHandler& game::getSockObj(){
-    return sock_obj;
+    return sockObj;
 }
 
 void game::gameOverHandler(const snake& snk){
-    sock_obj.sendData("$");
+    sockObj.sendData("$");
     clear();
     initConsoleScreen("off");
     system("clear");
@@ -162,7 +162,7 @@ void game::gameOverHandler(const snake& snk){
     gameovermessage += "Score : " + std::to_string(snk.getScore()) + "\n";
     gameovermessage += "\n\nPress ctrl+c to exit.";
     printAnimated(gameovermessage);
-    sock_obj.closeSocket();
+    sockObj.closeSocket();
     sleep(5000);
 }
 
@@ -172,83 +172,83 @@ void game::printScore(const snake& snk, string pos){
     mvprintw(0, 0, "Score = %d", snk.getScore());
 }
 
-void game::draw_snake(const snake& snk){
+void game::drawSnake(const snake& snk){
     int i;
     coloron(snk.getBodyColor());
-    for(i =0; i < snk.getParts().size() - 1; i++){
+    for (i = 0; i < snk.getParts().size() - 1; i++){
         mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "o");
     }
     coloroff(snk.getBodyColor());
     mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "+");
 }
 
-void game::init_snake_on_screen(snake& snk){
-    snk.add_part(getCenterX(), getCenterY());
-    snk.add_part(getCenterX() + 1, getCenterY());
-    snk.add_part(getCenterX() + 2,getCenterY());
+void game::initSnakeOnScreen(snake& snk){
+    snk.addPart(getCenterX(), getCenterY());
+    snk.addPart(getCenterX() + 1, getCenterY());
+    snk.addPart(getCenterX() + 2, getCenterY());
 
-    draw_snake(snk);
+    drawSnake(snk);
 }
 
-void game::move_snake(snake& snk, int direction){
+void game::moveSnake(snake& snk, int direction){
     snk.getParts().erase(snk.getParts().begin());
     snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
 
-    if(direction == 2){
-        snk.add_part((last_part.getX() + 1) % maxX, last_part.getY());
+    if (direction == 2){
+        snk.addPart((last_part.getX() + 1) % maxX, last_part.getY());
         snk.setDirection(2);
     }
-    else if(direction == 0){
-        snk.add_part((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
+    else if (direction == 0){
+        snk.addPart((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
         snk.setDirection(0);
     }
-    else if(direction == 1){
-        snk.add_part(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
+    else if (direction == 1){
+        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
         snk.setDirection(1);
     }
-    else if(direction == 3){
-        snk.add_part(last_part.getX(), (last_part.getY() + 1) % maxY);
+    else if (direction == 3){
+        snk.addPart(last_part.getX(), (last_part.getY() + 1) % maxY);
         snk.setDirection(3);
     }
 
-    check_snake_overlap(snk);
+    checkSnakeOverlap(snk);
 
     if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
-        snk.add_part(getFoodX(), getFoodY());
+        snk.addPart(getFoodX(), getFoodY());
         snk.setScore(snk.getScore() + 1);
-        sock_obj.sendData("#");
+        sockObj.sendData("#");
 
         setFoodPos(-10, -10);
     }
-    draw_snake(snk);
+    drawSnake(snk);
     refresh();
 }
 
 void game::handleMovementKeyPress(snake& snk, const int code){
-    if(code==17 || code == 103){
+    if (code == 17 || code == 103){
         if (snk.getDirection() != 3 && snk.getDirection() != 1)
-            move_snake(snk, 1);
+            moveSnake(snk, 1);
     }
-    else if(code==31 || code==108){
+    else if (code == 31 || code == 108){
         if (snk.getDirection() != 1 && snk.getDirection() != 3)
-            move_snake(snk, 3);
+            moveSnake(snk, 3);
     }
-    else if(code==30 || code==106){
+    else if (code == 30 || code == 106){
         if (snk.getDirection() != 0 && snk.getDirection() != 2)
-            move_snake(snk, 2);
+            moveSnake(snk, 2);
     }
-    else if(code==32 || code==105){
+    else if(code == 32 || code == 105){
         if (snk.getDirection() != 2 && snk.getDirection() != 0)
-            move_snake(snk, 0);
+            moveSnake(snk, 0);
     }
     else return;
 }
 
-void game::check_snake_overlap(snake& snk){
-    int headX = snk.getHeadX(), headY  = snk.getHeadY();
+void game::checkSnakeOverlap(snake& snk){
+    int headX = snk.getHeadX(), headY = snk.getHeadY();
     for (int i = 0; i < snk.getParts().size() - 1; i++)
         if (snk.getPart(i).getX() == headX && snk.getPart(i).getY() == headY){
-            if (socket_descriptor > 0)
+            if (socketDescriptor > 0)
                 return;
             gameOverHandler(snk);
         }
@@ -256,14 +256,14 @@ void game::check_snake_overlap(snake& snk){
 
 void game::readData(){
     int val;
-    FD_ZERO(&sock_obj.getSet());
-    FD_SET(sock_obj.getSock(), &sock_obj.getSet());
+    FD_ZERO(&sockObj.getSet());
+    FD_SET(sockObj.getSock(), &sockObj.getSet());
 
-    val = select(sock_obj.getSock() + 1, &sock_obj.getSet(), NULL, NULL, &sock_obj.getTimeout());
+    val = select(sockObj.getSock() + 1, &sockObj.getSet(), NULL, NULL, &sockObj.getTimeout());
 
     if(val > 0){
-        recv(sock_obj.getSock(), sock_obj.getBuffer(), 1024, 0);
-        handleMessageFromServer(string(sock_obj.getBuffer()));
+        recv(sockObj.getSock(), sockObj.getBuffer(), 1024, 0);
+        handleMessageFromServer(string(sockObj.getBuffer()));
     }
 
     else if(val == -1){

@@ -2,7 +2,7 @@
 
 SocketHandler::SocketHandler(){
     sock = 0;
-    memset(&serv_addr, '0', sizeof(serv_addr));
+    memset(&servAddr, '0', sizeof(servAddr));
     memset(buffer, 0,sizeof(buffer));
     timeout.tv_sec = timeout.tv_usec = 0;
 }
@@ -29,10 +29,10 @@ void SocketHandler::createClientSocket(){
 }
 
 void SocketHandler::initServerAddress(string address, int port){
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(port);
+    servAddr.sin_family = AF_INET;
+    servAddr.sin_port = htons(port);
 
-    if (inet_pton(AF_INET,address.c_str(), &serv_addr.sin_addr) <= 0){
+    if (inet_pton(AF_INET,address.c_str(), &servAddr.sin_addr) <= 0){
         printf("\nInvalid address/ Address not supported \n");
     }
 }
@@ -49,7 +49,7 @@ int SocketHandler::connectToServer(string address, int port) {
         close(sock);
         return 2;
     }
-    int connectResult = connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    int connectResult = connect(sock, (struct sockaddr *)&servAddr, sizeof(servAddr));
     if (connectResult < 0) {
         printf("\nConnection Failed \n");
         close(sock);

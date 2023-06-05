@@ -10,10 +10,9 @@ class game{
 private:
     int noOfPlayers;
     food foodObj;
-    int center_x, center_y;
-    snake * mainSnakePtr;
+    int centerX, centerY;
 
-    int socket_descriptor = -1;
+    int socketDescriptor = -1;
 
     int maxX = 0;
     int maxY = 0;
@@ -30,14 +29,14 @@ public:
     void showInitialChoices();
     void syncSnakeWithClient(snake &);
     int getSnakeIndexFromID(int);
-    void reset_max_screen();
+    void resetMaxScreen();
     void printAnimated(string, int);
-    void draw_snake(snake&);
-    void draw_all_snakes();
+    void drawSnake(snake&);
+    void drawAllSnakes();
     void printFood(string);
-    void move_snake(snake&, int direction);
+    void moveSnake(snake&, int direction);
     void moveAllSnakes() ;
-    void LAN_sendFoodCoordinates(int , int ) ;
+    void LANSendFoodCoordinates(int , int ) ;
     void setFoodPos(int , int) ;
     void printScores() ;
     void handleNewConnection() ;
@@ -54,8 +53,8 @@ public:
     int getNoOfPlayers();
     void setNoOfPlayers(int n);
     void initConsoleScreen(string);
-    void init_snake_on_screen(snake&);
-    void check_snake_overlap(snake&);
+    void initSnakeOnScreen(snake&);
+    void checkSnakeOverlap(snake&);
     void handleMovementKeyPress(snake& snk, const int code);
     void gameOverHandler(const snake& snk);
 

@@ -14,9 +14,9 @@
 
 class socketHandler{
     int opt;
-    int master_socket, PORT, addrlen, new_socket, client_socket[30],
-          max_clients, activity, i, valread, sd;
-    int max_sd;
+    int masterSocket, PORT, addrlen, newSocket, clientSocket[30],
+          maxClients, activity, i, valread, sd;
+    int maxSd;
     struct sockaddr_in address;
     char message[50];
     struct timeval timeout;
@@ -24,7 +24,7 @@ class socketHandler{
     char buffer[1025];  //data buffer of 1K 
     fd_set readfds;
 
-    void initServerSocket() ;
+    void initServerSocket();
 
 public:
     socketHandler();

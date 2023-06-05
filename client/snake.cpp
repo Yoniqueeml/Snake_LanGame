@@ -24,11 +24,11 @@ int snake::getScore() const{
 }
 
 int snake::getBodyColor() const{
-    return bodycolor;
+    return bodyColor;
 }
 
-void snake::add_part(int x , int y){
-    snake_part obj(x , y) ;
+void snake::addPart(int x, int y){
+    snake_part obj(x, y);
     parts.push_back(obj);
 }
 
@@ -52,5 +52,5 @@ const snake_part& snake::getPart(const int i) const{
 
 
 string snake::getName() const{
-    return player_name;
+    return playerName;
 }
