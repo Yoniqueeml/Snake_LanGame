@@ -74,7 +74,14 @@ int main(){
         if (r > 0) {
             for (int i = 0; i < 5; ++i) {
                 if (buff[i].type == 1 && buff[i].value == 1) {
-                    GameObj.getSockObj().sendData(string(1, buff[i].value));
+                    if (buff[i].code == 17 || buff[i].code == 103)
+                        GameObj.getSockObj().sendData(string(1, 'A'));
+                    if (buff[i].code == 31 || buff[i].code == 108)
+                        GameObj.getSockObj().sendData(string(1, 'B'));
+                    if (buff[i].code == 30 || buff[i].code == 106)
+                        GameObj.getSockObj().sendData(string(1, 'C'));
+                    if (buff[i].code == 32 || buff[i].code == 105)
+                        GameObj.getSockObj().sendData(string(1, 'D'));
                     GameObj.handleMovementKeyPress(first_snake, buff[i].code);
                 }
             }

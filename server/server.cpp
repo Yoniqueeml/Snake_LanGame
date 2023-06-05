@@ -84,16 +84,14 @@ socketHandler::socketHandler(){
 
 
 
-int socketHandler::checkClientActiviy()
-{
+int socketHandler::checkClientActiviy(){
     //wait for an activity on one of the sockets , timeout is NULL ,
     //so wait indefinitely
     setupClientDescriptors() ;
 
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &timeout);
 
-    if ((activity < 0) && (errno!=EINTR))
-    {
+    if ((activity < 0) && (errno!=EINTR)){
         printf("select error\n");
     }
 
@@ -101,39 +99,31 @@ int socketHandler::checkClientActiviy()
 }
 
 
-void socketHandler::closeSocket(int sd)
-{
+void socketHandler::closeSocket(int sd){
     close(sd) ;
-    for(int i=0 ; i<max_clients ; i++)
-    {
-        if(client_socket[i]==sd)
-        {
+    for(int i=0 ; i<max_clients ; i++){
+        if(client_socket[i]==sd){
             client_socket[i] = 0 ;
         }
     }
 }
 
-void socketHandler::stopServer()
-{
+void socketHandler::stopServer(){
     close(master_socket) ;
 }
 
 
 //returns the sd of new client
-int socketHandler:: handleNewConnection()
-{
+int socketHandler:: handleNewConnection(){
     if ((new_socket = accept(master_socket,
-                             (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
-    {
+                             (struct sockaddr *)&address, (socklen_t*)&addrlen))<0){
         perror("accept");
         exit(EXIT_FAILURE);
     }
 
-    for (i = 0; i < max_clients; i++)
-    {
+    for (i = 0; i < max_clients; i++){
         //if position is empty
-        if( client_socket[i] == 0 )
-        {
+        if( client_socket[i] == 0 ){
             client_socket[i] = new_socket;
             printf("Adding to list of sockets as %d\n" , i);
 
@@ -145,18 +135,15 @@ int socketHandler:: handleNewConnection()
 }
 
 
-std::string socketHandler::handleIOActivity(int client_sd)
-{
-    if ((valread = read( client_sd , buffer, 1024)) <= 0)
-    {
+std::string socketHandler::handleIOActivity(int client_sd){
+    if ((valread = read( client_sd , buffer, 1024)) <= 0){
         //Somebody disconnected , get his details and print
         getpeername(client_sd , (struct sockaddr*)&address ,(socklen_t*)&addrlen);
         // printf("Host disconnected , ip %s , port %d \n" , inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
 
         //Close the socket and mark as 0 in list for reuse
         close( client_sd );
-        for(int i =0 ; i<max_clients ; i++)
-        {
+        for(int i =0 ; i<max_clients ; i++){
             if(client_socket[i]==client_sd)
                 client_socket[i] = 0;
         }
@@ -165,8 +152,7 @@ std::string socketHandler::handleIOActivity(int client_sd)
     }
 
         //Echo back the message that came in
-    else
-    {
+    else{
         //set the string terminating NULL byte on the end
         //of the data read
         buffer[valread] = '\0';
@@ -185,24 +171,20 @@ void socketHandler::sendData(int client_sd , std::string msg)
 
 
 //Returns array with -1 if its a new connection else returns a list of client sds
-std::vector<int> socketHandler::handleActivity()
-{
+std::vector<int> socketHandler::handleActivity(){
     std::vector <int> descriptors ;
     //If something happened on the master socket ,
     //then its an incoming connection
-    if (FD_ISSET(master_socket, &readfds))
-    {
+    if (FD_ISSET(master_socket, &readfds)){
         descriptors.push_back(-1);
     }
 
     else{
         //else its some IO operation on some other socket
-        for (i = 0; i < max_clients; i++)
-        {
+        for (i = 0; i < max_clients; i++){
             sd = client_socket[i];
 
-            if (FD_ISSET( sd , &readfds))
-            {
+            if (FD_ISSET( sd , &readfds)){
                 descriptors.push_back(sd) ;
             }
         }

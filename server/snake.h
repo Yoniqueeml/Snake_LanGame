@@ -19,7 +19,7 @@ public:
         snakeDirection = 2;
         id = snakeid;
         player_name = name;
-        socket_descriptor = socket_descriptor;
+        this->socket_descriptor = socket_descriptor;
         bodycolor = rand() % 5 + 1;
     }
 

@@ -15,6 +15,10 @@ include_directories(server)
 #        client/snake_part.cpp client/snake_part.h
 #        client/server.cpp client/server.h
 #        client/game.cpp client/game.h)
-add_executable(snakes server/server.cpp server/server.h main.cpp)
+add_executable(snakes server/server_main.cpp server/server.cpp server/server.h
+                server/snake.cpp server/snake.h
+                server/food.cpp server/food.h
+                server/snake_part.cpp server/snake_part.h
+                server/game.cpp server/game.h)
 #target_link_libraries(snakes ${CURSES_LIBRARIES})
 target_link_libraries(snakes ${CURSES_LIBRARIES})

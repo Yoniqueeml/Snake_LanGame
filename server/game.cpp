@@ -1,9 +1,5 @@
 #include "game.h"
 
-#include <ncurses.h>
-#include <iostream>
-#include <csignal>
-
 #define RED 7
 #define GREEN 2
 #define YELLOW 3
@@ -21,15 +17,15 @@ game::game(int players){
 }
 
 void game::generateFood(){
-    int x = random() % maxX , y = random() % maxY;
+    int x = random() % maxX, y = random() % maxY;
     if (!x) x = 2;
     if (!y) y = 2;
     coloron(RED);
-    mvprintw(y, x,"@");
+    mvprintw(y, x, "@");
     coloroff(RED);
-    setFoodPos(x , y);
+    setFoodPos(x, y);
 
-    LAN_sendFoodCoordinates( getFoodX() , getFoodY()) ;
+    LAN_sendFoodCoordinates( getFoodX(), getFoodY());
 }
 
 void game::printFood(string status){
@@ -65,31 +61,6 @@ void game::setFoodPos(int x, int y){
     foodObj.setX(x);
     foodObj.setY(y);
 }
-
-/*void game::handleMessageFromServer(string msg){
-    if (msg.find(":") != string::npos){
-        int start_colon = msg.find(":");
-
-        int camma = msg.find(",");
-        string str_x = msg.substr(start_colon + 1 , camma - 1);
-        string str_y = msg.substr(camma+1, 3);
-
-        int x  = stoi(str_x), y = stoi(str_y);
-
-        setFoodPos(x, y);
-    }
-
-    //Handle game over message sent from server
-    if (msg.find("$")!=string::npos){
-        int start = msg.find("$");
-        string num = "";
-        for (int i = start + 1; msg[i] != '$'; i++){
-            num += msg[i];
-        }
-        mainSnakePtr->setScore(stoi(num));
-        gameOverHandler(*mainSnakePtr);
-    }
-}*/
 
 int game::getFoodX(){
     return foodObj.getX();
@@ -154,7 +125,7 @@ void game::initConsoleScreen(string state){
 void game::init_snake_on_screen(snake& snk){
     snk.add_part(getCenterX(), getCenterY());
     snk.add_part(getCenterX() + 1, getCenterY());
-    snk.add_part(getCenterX() + 2,getCenterY());
+    snk.add_part(getCenterX() + 2, getCenterY());
 
     draw_snake(snk);
 }
@@ -193,21 +164,21 @@ void game::move_snake(snake& snk, int direction){
 }
 
 void game::moveAllSnakes(){
-    for (int i =0; i < allSnakes.size(); i++){
+    for (int i = 0; i < allSnakes.size(); i++){
         move_snake(allSnakes[i], allSnakes[i].getDirection());
     }
 }
 
 void game::handleMovementKeyPress(snake& snk, const int code){
-    if(code==17 || code == 103){
+    if(code == 17 || code == 103){
         if (snk.getDirection() != 3 && snk.getDirection() != 1)
             move_snake(snk, 1);
     }
-    else if(code==31 || code==108){
+    else if(code == 31 || code == 108){
         if (snk.getDirection() != 1 && snk.getDirection() != 3)
             move_snake(snk, 3);
     }
-    else if(code==30 || code==106){
+    else if(code == 30 || code == 106){
         if (snk.getDirection() != 0 && snk.getDirection() != 2)
             move_snake(snk, 2);
     }
@@ -236,6 +207,7 @@ int game::getSnakeIndexFromID(int id){
         if (allSnakes[i].getId() == id)
             return i;
     }
+    return -1;
 }
 
 void game::printScores(){
@@ -298,8 +270,8 @@ void game::draw_all_snakes(){
     }
 }
 
-void game::LAN_sendFoodCoordinates(int x , int y){
-    for(int temp= 0; temp < allSnakes.size(); temp++){
+void game::LAN_sendFoodCoordinates(int x, int y){
+    for (int temp= 0; temp < allSnakes.size(); temp++){
         int sd  = allSnakes[temp].getSocketDescriptor();
 
         if (sd > 0){
@@ -311,9 +283,9 @@ void game::LAN_sendFoodCoordinates(int x , int y){
 }
 
 void game::initServerForMultiplayer(){
-    server.bindServer() ;
-    server.setupClientDescriptors() ;
-    server.startServer() ;
+    server.bindServer();
+    server.setupClientDescriptors();
+    server.startServer();
 }
 
 void game::handleNewConnection(){
@@ -345,7 +317,7 @@ void game::handleIOActivity(){
     string msg ;
     int snake_index ;
 
-    for (int i =0 ; i<clients.size() ; i++){
+    for (int i =0 ; i < clients.size() ; i++){
         snake_index = getSnakeIndexFromDescriptor(clients[i]) ;
 
         msg = server.handleIOActivity(clients[i]) ;   //handleIOActivity takes a client sd from the list of client sds which  and returns the string sent by client
@@ -376,12 +348,12 @@ void game::handleIOActivity(){
 
             sight = msg[i+2];
 
-            initConsoleScreen("off") ;
-            system("clear") ;
-            cout<<"\n\n"<<name<<" joined the game.\n\n" ;
-            sleep(1) ;
-            system("clear") ;
-            initConsoleScreen("on") ;
+            initConsoleScreen("off");
+            system("clear");
+            cout<<"\n\n"<<name<<" joined the game.\n\n";
+            sleep(1);
+            system("clear");
+            initConsoleScreen("on");
             allSnakes[snake_index].setName(name) ;
             allSnakes[snake_index].setBodyColor(int(msg[msg.find("&")+1]-'0')) ;
         }
@@ -396,9 +368,8 @@ void game::handleIOActivity(){
 
             //Handle key press
         else{
-            for(int c = 0 ; c<msg.length() ; c++){
-                if(msg[c]=='#') {
-                    //Client has eaten a food . Increase its part
+            for(int c = 0; c < msg.length(); c++){
+                if (msg[c]=='#') {
                     allSnakes[snake_index].add_part(allSnakes[snake_index].getHeadX(),
                                                     allSnakes[snake_index].getHeadY());
                     allSnakes[snake_index].setScore(allSnakes[snake_index].getScore() + 1);
@@ -406,18 +377,23 @@ void game::handleIOActivity(){
                     syncSnakeWithClient(allSnakes[snake_index]);
 
                     printFood("new");
-
                     LAN_sendFoodCoordinates(getFoodX(), getFoodY());
                 }
-                else if(msg[c]=='A' or msg[c]=='B' or msg[c]=='C' or msg[c]=='D') //todo refactor
-                    handleMovementKeyPress(allSnakes[snake_index], msg[c]);
+                else if(msg[c]=='A' or msg[c]=='B' or msg[c]=='C' or msg[c]=='D') {
+                    int code = 0;
+                    if (msg[c]=='A') code = 17;
+                    if (msg[c]=='B') code = 31;
+                    if (msg[c]=='C') code = 30;
+                    if (msg[c]=='D') code = 32;
+                    handleMovementKeyPress(allSnakes[snake_index], code);
+                }
             }
         }
     }
 }
 
 int game::getSnakeIndexFromDescriptor(int sd){
-    for(int temp=0; temp < allSnakes.size(); temp++){
+    for (int temp=0; temp < allSnakes.size(); temp++){
         if (sd == allSnakes[temp].getSocketDescriptor()){
             return temp;
         }
@@ -456,20 +432,6 @@ void game::showInitialChoices(){
     showInitialChoices() ;
 }
 
-/*
-void game::readData(){
-    int val;
-    FD_ZERO(&sock_obj.getSet());
-    FD_SET(sock_obj.getSock(), &sock_obj.getSet());
-
-    val = select(sock_obj.getSock() + 1, &sock_obj.getSet(), NULL, NULL, &sock_obj.getTimeout());
-
-    if(val > 0){
-        recv(sock_obj.getSock(), sock_obj.getBuffer(), 1024, 0);
-        handleMessageFromServer(string(sock_obj.getBuffer()));
-    }
-
-    else if(val == -1){
-        perror("select");
-    }
-}*/
+socketHandler& game::getServer(){
+    return server;
+}

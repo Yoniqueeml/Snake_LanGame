@@ -2,6 +2,10 @@
 #include "snake.h"
 #include "server.h"
 
+#include <ncurses.h>
+#include <iostream>
+#include <csignal>
+
 class game{
 private:
     int noOfPlayers;
@@ -14,7 +18,7 @@ private:
     int maxX = 0;
     int maxY = 0;
 
-    SocketHandler server;
+    socketHandler server;
     vector<int> clients;
 public:
     vector <snake> allSnakes; // todo add to private
@@ -60,7 +64,7 @@ public:
     void gameOverHandler(const snake& snk);
 
     void initColors();
-
     void readData();
+    socketHandler& getServer();
 };
 
