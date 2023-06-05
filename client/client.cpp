@@ -1,10 +1,10 @@
-#include <string.h>   //strlen
+#include <string.h>
 #include <stdlib.h>
 #include <ncurses.h>
 #include<iostream>
 #include<bits/stdc++.h>
 #include<unistd.h>
-#include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
+#include <sys/time.h>
 #include <sys/fcntl.h>
 
 #include "game.h"
@@ -34,41 +34,37 @@ int main(){
         throw "Error keyboard logging";
     }
 
-    signal(SIGINT , signalHandler) ;
-    srand(time(NULL)) ;
-    system("clear") ;
-    string serverAddress  , player_name;
-    cout<<"Enter your name : " ;
+    signal(SIGINT, signalHandler);
+    srand(time(NULL));
+    system("clear");
+    string serverAddress, player_name;
+    cout << "Enter your name : ";
 
-    getline(cin , player_name) ;
+    getline(cin , player_name);
 
 
-    cout<<"Enter the IP address of the Controlling Server : "  ;
-    cin>>serverAddress ;
+    cout << "Enter the IP address of the Controlling Server : ";
+    cin >> serverAddress;
 
-    //Set some socket options
     int connection = GameObj.getSockObj().connectToServer(serverAddress , 8888);
     if(connection == 2){
         close(fd);
-        cout<<"Failed to connect to the server" << endl;
+        cout << "Failed to connect to the server" << endl;
         GameObj.getSockObj().closeSocket();
         exit(1);
     }
-    //Initialize the snake object
     snake first_snake(0, player_name);
     GameObj.setMainSnakePtr(&first_snake);
 
-    GameObj.getSockObj().sendData("init~~" + player_name+"~~"+"c"+"~~"+"&"+to_string(first_snake.getBodyColor())+"&") ;
+    GameObj.getSockObj().sendData("init~~" + player_name+"~~"+"c"+"~~"+"&"+to_string(first_snake.getBodyColor())+"&");
 
     GameObj.initConsoleScreen("on");
     GameObj.initColors();
 
     GameObj.init_snake_on_screen(first_snake);
 
-    char ch;
-
     input_event buff[5];
-    for(;;){
+    while(true){
         GameObj.reset_max_screen();
         int r = read(fd, &buff, sizeof(input_event)*5);
         if (r > 0) {

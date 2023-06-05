@@ -182,14 +182,12 @@ void game::handleMovementKeyPress(snake& snk, const int code){
         if (snk.getDirection() != 0 && snk.getDirection() != 2)
             move_snake(snk, 2);
     }
-    else if(code==32 || code==105){
+    else if(code == 32 || code == 105){
         if (snk.getDirection() != 2 && snk.getDirection() != 0)
             move_snake(snk, 0);
     }
     else return;
 }
-
-
 
 void game::check_snake_overlap(snake& snk){
     int headX = snk.getHeadX(), headY  = snk.getHeadY();
@@ -197,7 +195,7 @@ void game::check_snake_overlap(snake& snk){
         if (snk.getPart(i).getX() == headX && snk.getPart(i).getY() == headY){
             if (socket_descriptor > 0)
                 return;
-            server.sendData(socket_descriptor , "$"+std::to_string(snk.getScore())+"$");
+            server.sendData(socket_descriptor , "$" + std::to_string(snk.getScore()) + "$");
             gameOverHandler(snk);
         }
 }
@@ -227,7 +225,7 @@ void game::gameOverHandler(const snake& snk){
     initConsoleScreen("off");
     system("clear");
     string gameovermessage = "\n\n\nGAME OVER FOR " + snk.getName() + " :(\n\n";
-    gameovermessage+="Score : " + std::to_string(snk.getScore())+"\nBetter Luck Next time :)\n\n";
+    gameovermessage+="Score : " + std::to_string(snk.getScore()) + "\nBetter Luck Next time :)\n\n";
 
     printAnimated(gameovermessage);
 
@@ -242,13 +240,13 @@ void game::gameOverHandler(const snake& snk){
 
     if (getNoOfPlayers() == 0){
         initConsoleScreen("off");
-        cout<<"\nNo Snakes Left to Play :(  Exiting Game ..." << endl << endl;
-        sleep(2) ;
-        exit(3) ;
+        cout << "\nNo Snakes Left to Play :(  Exiting Game ..." << endl << endl;
+        sleep(1);
+        exit(3);
     }
 
-    printAnimated("\n\nGame will continue in few seconds." ) ;
-    sleep(3) ;
+    printAnimated("\n\nGame will continue in few seconds.");
+    sleep(1);
 }
 
 void game::draw_snake(snake& snk){
@@ -263,9 +261,9 @@ void game::draw_snake(snake& snk){
 
 void game::draw_all_snakes(){
     for(int i =0; i<allSnakes.size(); i++){
-        allSnakes[i].add_part(center_x+5 , center_y) ;
-        allSnakes[i].add_part(center_x+6 , center_y) ;
-        allSnakes[i].add_part(center_x+7 , center_y) ;
+        allSnakes[i].add_part(center_x + 5 , center_y);
+        allSnakes[i].add_part(center_x + 6 , center_y);
+        allSnakes[i].add_part(center_x + 7 , center_y);
         draw_snake(allSnakes[i]);
     }
 }
@@ -294,7 +292,6 @@ void game::handleNewConnection(){
     allSnakes.push_back(*clientSnakePtr);
     setNoOfPlayers(getNoOfPlayers() + 1);
 
-    //Add the initial parts of the snake
     allSnakes[allSnakes.size() - 1].add_part(center_x + 5, center_y);
     allSnakes[allSnakes.size() - 1].add_part(center_x + 6, center_y);
     allSnakes[allSnakes.size() - 1].add_part(center_x + 7, center_y);
@@ -302,12 +299,10 @@ void game::handleNewConnection(){
 }
 
 void game::syncSnakeWithClient(snake& clientsnake){
-    //Only call this when the client snakes eats a food
-    //food coordinate represents client snake's head. Translate the snake with the the offset in reference to the food coord.
     int x_diff = getFoodX() - clientsnake.getHeadX();
     int y_diff = getFoodY() - clientsnake.getHeadY();
 
-    for(int i =0 ; i < clientsnake.getParts().size(); i++){
+    for(int i = 0 ; i < clientsnake.getParts().size(); i++){
         clientsnake.getPart(i).setX(clientsnake.getPart(i).getX() + x_diff);
         clientsnake.getPart(i).setY(clientsnake.getPart(i).getY() + y_diff);
     }
@@ -317,12 +312,10 @@ void game::handleIOActivity(){
     string msg ;
     int snake_index ;
 
-    for (int i =0 ; i < clients.size() ; i++){
-        snake_index = getSnakeIndexFromDescriptor(clients[i]) ;
+    for (int i = 0 ; i < clients.size(); i++){
+        snake_index = getSnakeIndexFromDescriptor(clients[i]);
+        msg = server.handleIOActivity(clients[i]);
 
-        msg = server.handleIOActivity(clients[i]) ;   //handleIOActivity takes a client sd from the list of client sds which  and returns the string sent by client
-
-        //Handle disconnected clients
         if (msg == ""){
             initConsoleScreen("off");
             system("clear");
@@ -331,18 +324,18 @@ void game::handleIOActivity(){
             server.closeSocket(clients[i]);
             allSnakes.erase(allSnakes.begin() + snake_index);
             setNoOfPlayers(getNoOfPlayers() - 1);
-            sleep(2);
+            sleep(1);
             initConsoleScreen("on");
         }
 
 
-        else if(msg.find("init~~")!=string::npos){
+        else if(msg.find("init~~") != string::npos){
             LAN_sendFoodCoordinates(foodObj.getX() , foodObj.getY()) ;
-            string name="" , sight="";
-            int pos = msg.find("init~~") ;
-            int i ;
+            string name="", sight="";
+            int pos = msg.find("init~~");
+            int i;
 
-            for( i =6 ; msg[i]!='~' ; i++){
+            for (i = 6; msg[i] != '~'; i++){
                 name+=msg[i];
             }
 
@@ -350,23 +343,20 @@ void game::handleIOActivity(){
 
             initConsoleScreen("off");
             system("clear");
-            cout<<"\n\n"<<name<<" joined the game.\n\n";
+            cout << "\n\n" << name << " joined the game.\n\n";
             sleep(1);
             system("clear");
             initConsoleScreen("on");
-            allSnakes[snake_index].setName(name) ;
-            allSnakes[snake_index].setBodyColor(int(msg[msg.find("&")+1]-'0')) ;
+            allSnakes[snake_index].setName(name);
+            allSnakes[snake_index].setBodyColor(int(msg[msg.find("&") + 1] - '0'));
         }
 
 
         else if(msg.find("$")!=string::npos){
-            //game over handle if recevies "$" msg from client .
             int start = msg.find("$");
             gameOverHandler(allSnakes[snake_index]);
         }
 
-
-            //Handle key press
         else{
             for(int c = 0; c < msg.length(); c++){
                 if (msg[c]=='#') {
@@ -379,7 +369,7 @@ void game::handleIOActivity(){
                     printFood("new");
                     LAN_sendFoodCoordinates(getFoodX(), getFoodY());
                 }
-                else if(msg[c]=='A' or msg[c]=='B' or msg[c]=='C' or msg[c]=='D') {
+                else if(msg[c] == 'A' or msg[c] == 'B' or msg[c] == 'C' or msg[c] == 'D') {
                     int code = 0;
                     if (msg[c]=='A') code = 17;
                     if (msg[c]=='B') code = 31;
@@ -414,22 +404,21 @@ int game::checkClientActivity(){
 }
 
 void game::showInitialChoices(){
-    system("clear") ;
-    cout<<"\n1. Start Game *"  ;
-    cout<<"\n2. Exit " ;
-    cout<<"\n\nEnter choice : " ;
-    int ch ;
-    cin >> ch ;
+    system("clear");
+    cout << "\n1. Start Game *";
+    cout << "\n2. Exit";
+    cout << "\n\nEnter choice : ";
+    int ch;
+    cin >> ch;
 
     switch(ch){
         case 1:
             return;
         case 2:
-            exit(5) ;
+            exit(5);
         default:
-            return ;
+            return;
     }
-    showInitialChoices() ;
 }
 
 socketHandler& game::getServer(){

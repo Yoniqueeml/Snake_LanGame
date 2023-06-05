@@ -13,7 +13,7 @@ private:
     int center_x, center_y;
     snake * mainSnakePtr;
 
-    int socket_descriptor =-1;
+    int socket_descriptor = -1;
 
     int maxX = 0;
     int maxY = 0;
@@ -21,11 +21,11 @@ private:
     socketHandler server;
     vector<int> clients;
 public:
-    vector <snake> allSnakes; // todo add to private
+    vector <snake> allSnakes;
 
     game(int players);
     void generateFood();
-    int getSnakeIndexFromDescriptor(int) ;
+    int getSnakeIndexFromDescriptor(int);
 
     void showInitialChoices();
     void syncSnakeWithClient(snake &);
@@ -34,10 +34,7 @@ public:
     void printAnimated(string, int);
     void draw_snake(snake&);
     void draw_all_snakes();
-    void KeyPressHandler();
     void printFood(string);
-    void MainEventLoop() ;
-    void ask_no_players(string) ; // Virezat nado
     void move_snake(snake&, int direction);
     void moveAllSnakes() ;
     void LAN_sendFoodCoordinates(int , int ) ;
@@ -47,7 +44,6 @@ public:
     void handleIOActivity() ;
     int checkClientActivity() ; //returns activity number
     void initServerForMultiplayer();
-    void setClientsList();
     void handleActivity();
     int getFoodX();
     int getFoodY();
