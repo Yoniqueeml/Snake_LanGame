@@ -92,7 +92,14 @@ int game::getNoOfPlayers(){
 }
 
 void game::resetMaxScreen(){
-    getmaxyx(stdscr, maxY, maxX);
+    int curX = 0, curY = 0;
+    getmaxyx(stdscr, curY, curX);
+    if (curX < maxX || curY < maxY){
+        initConsoleScreen("off");
+        cout << "\nConsole size is too small!!! Needed:" << maxX << "x" << maxY << endl << endl;
+        sleep(1);
+        exit(3);
+    }
 }
 
 void game::setNoOfPlayers(int n){
@@ -100,12 +107,19 @@ void game::setNoOfPlayers(int n){
 }
 
 void game::initConsoleScreen(string state){
-    if(state=="on"){
+    if (state == "on"){
         initscr(); //Init screen
         noecho(); // Dont show any pressed char
         curs_set(false); // Don't show the cursor
         start_color();
-        getmaxyx(stdscr, maxY, maxX);
+        int curX = 0, curY = 0;
+        getmaxyx(stdscr, curY, curX);
+        if (curX < maxX || curY < maxY){
+            initConsoleScreen("off");
+            cout << "\nConsole size is too small!!! Needed:" << maxX << "x" << maxY << endl << endl;
+            sleep(1);
+            exit(3);
+        }
         centerX = maxX / 2, centerY = maxY / 2;
         cbreak(); //Dont wait for enter to be pressed when using getch
         nodelay(stdscr, 1);  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
@@ -135,30 +149,31 @@ void game::moveSnake(snake& snk, int direction){
     snk.getParts().erase(snk.getParts().begin());
     snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
 
-    if(direction == 2){
-        snk.addPart((last_part.getX() + 1) % maxX, last_part.getY());
+    if (direction == 2){
+        snk.addPart(last_part.getX() % (maxX - 1) + 1, last_part.getY());
         snk.setDirection(2);
     }
-    else if(direction == 0){
-        snk.addPart((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
+    else if (direction == 0){
+        snk.addPart((last_part.getX() - 1) < 1 ? maxX - 2 :(last_part.getX() - 1), last_part.getY());
         snk.setDirection(0);
     }
-    else if(direction == 1){
-        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
+    else if (direction == 1){
+        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 1 ? maxY - 2:(last_part.getY() - 1));
         snk.setDirection(1);
     }
-    else if(direction == 3){
-        snk.addPart(last_part.getX(), (last_part.getY() + 1) % maxY);
+    else if (direction == 3){
+        snk.addPart(last_part.getX(), last_part.getY() % (maxY - 1) + 1);
         snk.setDirection(3);
     }
 
     checkSnakeOverlap(snk);
 
-    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
-        snk.addPart(getFoodX(), getFoodY());
-        snk.setScore(snk.getScore() + 1);
-        printFood("new");
-    }
+    //if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
+    //    snk.addPart(getFoodX(), getFoodY());
+    //    snk.setScore(snk.getScore() + 1);
+    //    printFood("new");
+    //}
+
     drawSnake(snk);
     refresh();
 }
@@ -193,9 +208,9 @@ void game::checkSnakeOverlap(snake& snk){
     int headX = snk.getHeadX(), headY  = snk.getHeadY();
     for (int i = 0; i < snk.getParts().size() - 1; i++)
         if (snk.getPart(i).getX() == headX && snk.getPart(i).getY() == headY){
-            if (socketDescriptor > 0)
+            if (snk.getSocketDescriptor() > 0)
                 return;
-            server.sendData(socketDescriptor , "$" + std::to_string(snk.getScore()) + "$");
+            server.sendData(snk.getSocketDescriptor(), "$" + std::to_string(snk.getScore()) + "$");
             gameOverHandler(snk);
         }
 }
@@ -225,13 +240,13 @@ void game::gameOverHandler(const snake& snk){
     initConsoleScreen("off");
     system("clear");
     string gameovermessage = "\n\n\nGAME OVER FOR " + snk.getName() + " :(\n\n";
-    gameovermessage+="Score : " + std::to_string(snk.getScore()) + "\nBetter Luck Next time :)\n\n";
+    gameovermessage += "Score : " + std::to_string(snk.getScore()) + "\nBetter Luck Next time :)\n\n";
 
     printAnimated(gameovermessage);
 
-    if (socketDescriptor > 0){
-        allSnakes.erase(allSnakes.begin() + getSnakeIndexFromDescriptor(socketDescriptor));
-        server.closeSocket(socketDescriptor);
+    if (snk.getSocketDescriptor() > 0){
+        allSnakes.erase(allSnakes.begin() + getSnakeIndexFromDescriptor(snk.getSocketDescriptor()));
+        server.closeSocket(snk.getSocketDescriptor());
     }
     else
         allSnakes.erase(allSnakes.begin() + getSnakeIndexFromID(snk.getId()));
@@ -330,13 +345,13 @@ void game::handleIOActivity(){
 
 
         else if(msg.find("init~~") != string::npos){
-            LANSendFoodCoordinates(foodObj.getX() , foodObj.getY()) ;
+            LANSendFoodCoordinates(foodObj.getX(), foodObj.getY()) ;
             string name="", sight="";
             int pos = msg.find("init~~");
             int i;
 
             for (i = 6; msg[i] != '~'; i++){
-                name+=msg[i];
+                name += msg[i];
             }
 
             sight = msg[i+2];
@@ -423,4 +438,24 @@ void game::showInitialChoices(){
 
 socketHandler& game::getServer(){
     return server;
+}
+
+void game::drawBorderWindow(){
+    int max_x = maxX, max_y = maxY;
+    for (int i = 0, j = 1; (i < max_x || j < max_y);){
+        if ( i < max_x)
+            mvprintw(1, i++, "--");
+        if (j < max_y)
+            mvprintw(j++, 0, "|");
+    }
+
+    max_x -= 1; max_y -= 1;
+
+    for (int i = max_x, j = max_y; (i > 0 || j > 0); ){
+        if (i > 0)
+            mvprintw(max_y, i--, "--");
+
+        if (j > 0)
+            mvprintw(j--, max_x, "|");
+    }
 }
