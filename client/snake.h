@@ -13,16 +13,13 @@ private:
     int score, id, bodycolor;
 
 public:
-    snake(int snakeid, string name="Name"){
+    snake(int snakeid, string name="Unknown"){
         score = 0;
         snakeDirection = 2;
         id = snakeid;
         player_name = name;
         bodycolor = rand() % 5 + 1;
     }
-    snake (){
-        score = 0;
-    } // viewsnake
     int getHeadX() const;
     int getHeadY() const;
     int getDirection() const;

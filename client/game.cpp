@@ -82,9 +82,11 @@ vector<string> splitString(const string& str, const string& delimiter) {
     return result;
 }
 snake deserializeSnake(const string& snakeStr) {
-    snake deserializedSnake;
     size_t offset = 0;
-
+    int id;
+    std::memcpy(&id, snakeStr.data() + offset, sizeof(id));
+    offset += sizeof(id);
+    snake deserializedSnake(id);
     int direction;
     std::memcpy(&direction, snakeStr.data() + offset, sizeof(direction));
     deserializedSnake.setDirection(direction);

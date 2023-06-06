@@ -392,6 +392,7 @@ int game::getSnakeIndexFromDescriptor(int sd){
 std::vector<char> serializeSnakes(std::vector<snake> Snakes){
     std::vector<char> data;
     for (auto const s : Snakes){
+        data.insert(data.end(), reinterpret_cast<const char*>(s.getId()),reinterpret_cast<const char*>(s.getId())+sizeof(s.getId()));
         data.insert(data.end(), reinterpret_cast<const char*>(s.getDirection()),reinterpret_cast<const char*>(s.getDirection())+sizeof(s.getDirection()));
         data.insert(data.end(), reinterpret_cast<const char*>(s.getBodyColor()),reinterpret_cast<const char*>(s.getBodyColor())+sizeof(s.getBodyColor()));
         size_t partsSize = s.getParts().size();
