@@ -35,6 +35,7 @@ int main(){
     }
 
     signal(SIGINT, signalHandler);
+    signal(SIGWINCH, signalHandler);
     srand(time(NULL));
     system("clear");
     string serverAddress, player_name;
