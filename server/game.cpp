@@ -389,7 +389,21 @@ int game::getSnakeIndexFromDescriptor(int sd){
         }
     }
 }
-
+std::vector<char> serializeSnakes(std::vector<snake> Snakes){
+    std::vector<char> data;
+    for (auto const s : Snakes){
+        data.insert(data.end(), reinterpret_cast<const char*>(s.getDirection()),reinterpret_cast<const char*>(s.getDirection())+sizeof(s.getDirection()));
+        data.insert(data.end(), reinterpret_cast<const char*>(s.getBodyColor()),reinterpret_cast<const char*>(s.getBodyColor())+sizeof(s.getBodyColor()));
+        size_t partsSize = s.getParts().size();
+        data.insert(data.end(), reinterpret_cast<const char*>(&partsSize), reinterpret_cast<const char*>(&partsSize) + sizeof(partsSize));
+        for (const auto& part : s.getParts()){
+            data.insert(data.end(),reinterpret_cast<const char*>(part.getX()), reinterpret_cast<const char*>(part.getX())+sizeof(part.getX()));
+            data.insert(data.end(),reinterpret_cast<const char*>(part.getY()), reinterpret_cast<const char*>(part.getY())+sizeof(part.getY()));
+        }
+        data.insert(data.end(),'==');
+    }
+    return data;
+}
 void game::handleActivity(){
     clients = server.handleActivity();
 
@@ -397,6 +411,13 @@ void game::handleActivity(){
         handleNewConnection();
     }
     else handleIOActivity();
+    std::vector<char> serializedSnakes = serializeSnakes(allSnakes);
+    for (int temp= 0; temp < allSnakes.size(); temp++){
+        int sd  = allSnakes[temp].getSocketDescriptor();
+        if (sd > 0){
+            server.sendData(sd, serializedSnakes);
+        }
+    }
 }
 
 int game::checkClientActivity(){
