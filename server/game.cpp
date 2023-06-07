@@ -422,11 +422,6 @@ std::string serializeSnakes(std::vector<snake> Snakes){
         }
     }
     data.push_back('?');
-    std::ofstream out;
-    out.open("text.txt");
-    out << data;
-    out << '-';
-    out.close();
     return data;
 }
 void game::handleActivity(){
