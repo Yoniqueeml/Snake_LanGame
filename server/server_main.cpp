@@ -52,7 +52,6 @@ int main(int argc , char * argv[]){
     GameObj.showInitialChoices();
 
     signal(SIGINT, signalHandler);
-    signal(SIGWINCH, signalHandler);
     HANDLE_EVERYTHING_TILL_EVENT_LOOP();
     int activity;
 

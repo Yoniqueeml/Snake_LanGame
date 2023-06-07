@@ -1,4 +1,5 @@
 #include "game.h"
+#include <fstream>
 
 #define RED 7
 #define GREEN 2
