@@ -106,6 +106,7 @@ void game::handleMessageFromServer(string msg){
         setFoodPos(x, y);
     }
 
+
     //Handle game over message sent from server
     if (msg.find("$") != string::npos){
         int start = msg.find("$");
@@ -217,8 +218,8 @@ void game::gameOverHandler(const snake& snk){
 
 void game::printScore(const snake& snk, string pos){
     if (pos == "right")
-        mvprintw(0, 15, "Score = %d:%d", snk.getScore(), snk.getId());
-    mvprintw(0, 0, "Score = %d:%d", snk.getScore(), snk.getId());
+        mvprintw(0, 15, "Score = %d", snk.getScore());
+    mvprintw(0, 0, "Score = %d", snk.getScore());
 }
 
 void game::drawSnake(const snake& snk){
@@ -296,7 +297,7 @@ void game::moveMainSnake(snake& snk, int direction){
 
     checkSnakeOverlap(snk);
 
-    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && &snk == mainSnakePtr){
+    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && snk.getId() == mainSnakePtr->getId()){
         snk.addPart(getFoodX(), getFoodY());
         snk.setScore(snk.getScore() + 1);
         sockObj.sendData("#");

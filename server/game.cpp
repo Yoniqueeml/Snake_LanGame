@@ -230,7 +230,7 @@ void game::printScores(){
     coloron(WHITE);
     for (int i = 0; i < allSnakes.size(); i++){
         temp = allSnakes[i].getName();
-        mvprintw(0 , s, "%s:%d:%d", temp.c_str(), allSnakes[i].getScore(), allSnakes[i].getId());
+        mvprintw(0 , s, "%s:%d", temp.c_str(), allSnakes[i].getScore());
         s += temp.length() + 4;
     }
     coloroff(WHITE);
@@ -368,7 +368,7 @@ void game::handleIOActivity(){
         }
 
 
-        else if(msg.find("$")!=string::npos){
+        else if(msg.find("$") != string::npos){
             int start = msg.find("$");
             gameOverHandler(allSnakes[snake_index]);
         }
@@ -399,7 +399,7 @@ void game::handleIOActivity(){
 }
 
 int game::getSnakeIndexFromDescriptor(int sd){
-    for (int temp=0; temp < allSnakes.size(); temp++){
+    for (int temp = 0; temp < allSnakes.size(); temp++){
         if (sd == allSnakes[temp].getSocketDescriptor()){
             return temp;
         }
