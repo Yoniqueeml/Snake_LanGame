@@ -76,16 +76,16 @@ std::vector<snake> deserializeSnakes(const std::string& data) {
             return {};
         }
         i += 1;
-        snake s(static_cast<int>(data[i]));
+        snake s(std::atoi(&data[i]));
         i += 2;
-        s.setBodyColor(static_cast<int>(data[i]));
+        s.setBodyColor(std::atoi(&data[i]));
         i += 2;
-        int partsSize = static_cast<int>(data[i]);
+        int partsSize = std::atoi(&data[i]);
         i += 2;
         for (int j = 0; j < partsSize; j++) {
-            int x = static_cast<int>(data[i]);
+            int x = std::atoi(&data[i]);
             i += 2;
-            int y = static_cast<int>(data[i]);
+            int y = std::atoi(&data[i]);
             i += 2;
             s.addPart(x,y);
             i += 2;
@@ -119,8 +119,7 @@ void game::handleMessageFromServer(string msg){
         gameOverHandler(*mainSnakePtr);
     }
     if (msg.find("=") != string::npos) {
-        std::vector<snake> viewSnakes;
-        viewSnakes = deserializeSnakes(msg);
+        allSnakes = deserializeSnakes(msg);
     }
 }
 
@@ -229,6 +228,15 @@ void game::drawSnake(const snake& snk){
     mvprintw(snk.getPart(i).getY(), snk.getPart(i).getX(), "+");
 }
 
+void game::drawAllSnakes(){
+    for (int i = 0; i < allSnakes.size(); i++){
+        allSnakes[i].addPart(centerX + 5 , centerY);
+        allSnakes[i].addPart(centerX + 6 , centerY);
+        allSnakes[i].addPart(centerX + 7 , centerY);
+        drawSnake(allSnakes[i]);
+    }
+}
+
 void game::initSnakeOnScreen(snake& snk){
     snk.addPart(getCenterX(), getCenterY());
     snk.addPart(getCenterX() + 1, getCenterY());
@@ -271,6 +279,11 @@ void game::moveSnake(snake& snk, int direction){
     refresh();
 }
 
+void game::moveAllSnakes(){
+    for (int i = 0; i < allSnakes.size(); i++){
+        moveSnake(allSnakes[i], allSnakes[i].getDirection());
+    }
+}
 void game::handleMovementKeyPress(snake& snk, const int code){
     if (code == 17 || code == 103){
         if (snk.getDirection() != 3 && snk.getDirection() != 1)

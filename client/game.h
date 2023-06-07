@@ -16,6 +16,7 @@ private:
 
     SocketHandler sockObj;
 public:
+    vector<snake> allSnakes;
     game(int players);
     void generateFood();
     void setMainSnakePtr(snake*);
@@ -37,8 +38,10 @@ public:
     void gameOverHandler(const snake& snk);
     void printScore(const snake&, string pos = "left");
     void drawSnake(const snake&);
+    void drawAllSnakes();
     void initSnakeOnScreen(snake&);
     void moveSnake(snake&, int);
+    void moveAllSnakes();
     void handleMovementKeyPress(snake&, int);
     void checkSnakeOverlap(snake&);
     void readData();

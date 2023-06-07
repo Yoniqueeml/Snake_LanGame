@@ -405,18 +405,18 @@ std::string serializeSnakes(std::vector<snake> Snakes){
     std::string data;
     for (auto const s : Snakes){
         data.push_back('=');
-        data.push_back(static_cast<char>(s.getId()));
+        data += std::to_string(s.getId());
         data.push_back('#');
-        data.push_back(static_cast<char>(s.getDirection()));
+        data += std::to_string(s.getDirection());
         data.push_back('#');
-        data.push_back(static_cast<char>(s.getBodyColor()));
+        data += std::to_string(s.getBodyColor());
         data.push_back('#');
-        data.push_back(static_cast<char>(s.getParts().size()));
+        data += std::to_string(s.getParts().size());
         data.push_back('#');
         for (const auto& part : s.getParts()){
-            data.push_back(static_cast<char>(part.getX()));
+            data += std::to_string(part.getX());
             data.push_back('#');
-            data.push_back(static_cast<char>(part.getY()));
+            data += std::to_string(part.getY());
             data.push_back('#');
         }
     }

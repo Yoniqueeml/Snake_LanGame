@@ -13,6 +13,19 @@ using namespace std ;
 
 game GameObj(1) ;
 
+void HANDLE_EVERYTHING_TILL_EVENT_LOOP(){
+    srand(time(NULL));
+    GameObj.initConsoleScreen("on");
+    GameObj.initColors();
+
+    flushinp();
+    GameObj.initConsoleScreen("off");
+    system("clear");
+    GameObj.setNoOfPlayers(1);
+
+    GameObj.drawAllSnakes();
+}
+
 void signalHandler(int code){
     GameObj.initConsoleScreen("off");
     GameObj.printAnimated("\nBye!", 6000);
@@ -88,6 +101,8 @@ int main(){
         clear();
         GameObj.drawBorderWindow();
         GameObj.moveSnake(first_snake, first_snake.getDirection());
+        GameObj.drawAllSnakes();
+        GameObj.moveAllSnakes();
         GameObj.printFood("old");
         GameObj.printScore(first_snake);
 
