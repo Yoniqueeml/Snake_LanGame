@@ -67,7 +67,7 @@ int main(){
     inputEvent buff[5];
     while(true){
         GameObj.resetMaxScreen();
-        int r = read(fd, &buff, sizeof(inputEvent)*5);
+        int r = read(fd, &buff, sizeof(inputEvent) * 5);
         if (r > 0) {
             for (int i = 0; i < 5; ++i) {
                 if (buff[i].type == 1 && buff[i].value == 1) {
@@ -85,15 +85,16 @@ int main(){
         }
         memset(buff, 0, sizeof(inputEvent) * 5);
         flushinp();
-        clear() ;
-        GameObj.moveSnake(first_snake, first_snake.getDirection()) ;
-        GameObj.printFood("old") ;
+        clear();
+        GameObj.drawBorderWindow();
+        GameObj.moveSnake(first_snake, first_snake.getDirection());
+        GameObj.printFood("old");
         GameObj.printScore(first_snake);
 
 
-        refresh() ;
-        GameObj.readData() ;
+        refresh();
+        GameObj.readData();
 
-        usleep(70000) ;
+        usleep(70000);
     }
 }

@@ -11,8 +11,8 @@ private:
 
     int socketDescriptor = -1;
 
-    int maxX = 0;
-    int maxY = 0;
+    const int maxX = 120;
+    const int maxY = 40;
 
     SocketHandler sockObj;
 public:
@@ -42,5 +42,6 @@ public:
     void handleMovementKeyPress(snake&, int);
     void checkSnakeOverlap(snake&);
     void readData();
+    void drawBorderWindow();
 };
 

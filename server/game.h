@@ -12,10 +12,8 @@ private:
     food foodObj;
     int centerX, centerY;
 
-    int socketDescriptor = -1;
-
-    int maxX = 0;
-    int maxY = 0;
+    const int maxX = 120;
+    const int maxY = 40;
 
     socketHandler server;
     vector<int> clients;
@@ -35,13 +33,13 @@ public:
     void drawAllSnakes();
     void printFood(string);
     void moveSnake(snake&, int direction);
-    void moveAllSnakes() ;
-    void LANSendFoodCoordinates(int , int ) ;
-    void setFoodPos(int , int) ;
-    void printScores() ;
-    void handleNewConnection() ;
-    void handleIOActivity() ;
-    int checkClientActivity() ; //returns activity number
+    void moveAllSnakes();
+    void LANSendFoodCoordinates(int, int );
+    void setFoodPos(int, int);
+    void printScores();
+    void handleNewConnection();
+    void handleIOActivity();
+    int checkClientActivity(); //returns activity number
     void initServerForMultiplayer();
     void handleActivity();
     int getFoodX();
@@ -61,5 +59,6 @@ public:
     void initColors();
     void readData();
     socketHandler& getServer();
+    void drawBorderWindow();
 };
 

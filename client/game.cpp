@@ -150,7 +150,15 @@ int game::getNoOfPlayers(){
 }
 
 void game::resetMaxScreen(){
-    getmaxyx(stdscr, maxY, maxX);
+    int curX = 0, curY = 0;
+    getmaxyx(stdscr, curY, curX);
+    if (curX < maxX || curY < maxY){
+        clear();
+        initConsoleScreen("off");
+        system("clear");
+        cout << "\nConsole size is too small!!! Needed:" << maxX << "x" << maxY << endl << endl;
+        sleep(5000);
+    }
 }
 
 void game::setNoOfPlayers(int n){
@@ -163,7 +171,15 @@ void game::initConsoleScreen(string state){
         noecho(); // Dont show any pressed char
         curs_set(false); // Don't show the cursor
         start_color();
-        getmaxyx(stdscr, maxY, maxX);
+        int curX = 0, curY = 0;
+        getmaxyx(stdscr, curY, curX);
+        if (curX < maxX || curY < maxY){
+            clear();
+            initConsoleScreen("off");
+            system("clear");
+            cout << "\nConsole size is too small!!! Needed:" << maxX << "x" << maxY << endl << endl;
+            sleep(5000);
+        }
         centerX = maxX / 2, centerY = maxY / 2;
         cbreak(); //Dont wait for enter to be pressed when using getch
         nodelay(stdscr, 1);  //Use non blocking input for getch which just returns ERR if there is no input (ERR=-1)
@@ -226,19 +242,19 @@ void game::moveSnake(snake& snk, int direction){
     snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
 
     if (direction == 2){
-        snk.addPart((last_part.getX() + 1) % maxX, last_part.getY());
+        snk.addPart(last_part.getX() % (maxX - 1) + 1, last_part.getY());
         snk.setDirection(2);
     }
     else if (direction == 0){
-        snk.addPart((last_part.getX() - 1) < 0 ? maxX - 1 :(last_part.getX() - 1), last_part.getY());
+        snk.addPart((last_part.getX() - 1) < 1 ? maxX - 2 :(last_part.getX() - 1), last_part.getY());
         snk.setDirection(0);
     }
     else if (direction == 1){
-        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 0 ? maxY - 1:(last_part.getY() - 1));
+        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 1 ? maxY - 2:(last_part.getY() - 1));
         snk.setDirection(1);
     }
     else if (direction == 3){
-        snk.addPart(last_part.getX(), (last_part.getY() + 1) % maxY);
+        snk.addPart(last_part.getX(), last_part.getY() % (maxY - 1) + 1);
         snk.setDirection(3);
     }
 
@@ -299,5 +315,25 @@ void game::readData(){
 
     else if(val == -1){
         perror("select");
+    }
+}
+
+void game::drawBorderWindow(){
+    int max_x = maxX, max_y = maxY;
+    for (int i = 0, j = 1; (i < max_x || j < max_y);){
+        if ( i < max_x)
+            mvprintw(1, i++, "--");
+        if (j < max_y)
+            mvprintw(j++, 0, "|");
+    }
+
+    max_x -= 1; max_y -= 1;
+
+    for (int i = max_x, j = max_y; (i > 0 || j > 0); ){
+        if (i > 0)
+            mvprintw(max_y, i--, "--");
+
+        if (j > 0)
+            mvprintw(j--, max_x, "|");
     }
 }

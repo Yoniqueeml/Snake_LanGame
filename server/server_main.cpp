@@ -7,7 +7,7 @@ using namespace std ;
 
 #include "game.h"
 
-game GameObj(1) ;
+game GameObj(0);
 
 void HANDLE_EVERYTHING_TILL_EVENT_LOOP(){
     srand(time(NULL));
@@ -70,11 +70,13 @@ int main(int argc , char * argv[]){
         flushinp();
         clear();
 
+        GameObj.drawBorderWindow();
         GameObj.moveAllSnakes();
         GameObj.printScores();
 
         GameObj.printFood("old");
         refresh();
         usleep(70000);
+
     }
 }
