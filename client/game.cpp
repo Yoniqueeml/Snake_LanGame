@@ -3,7 +3,7 @@
 #include <ncurses.h>
 #include <iostream>
 #include <csignal>
-
+#include <fstream>
 #define RED 7
 #define GREEN 2
 #define YELLOW 3
@@ -76,16 +76,16 @@ std::vector<snake> deserializeSnakes(const std::string& data) {
             return {};
         }
         i += 1;
-        snake s(static_cast<int>(data[i]));
+        snake s(std::atoi(&data[i]));
         i += 2;
-        s.setBodyColor(static_cast<int>(data[i]));
+        s.setBodyColor(std::atoi(&data[i]));
         i += 2;
-        int partsSize = static_cast<int>(data[i]);
+        int partsSize = std::atoi(&data[i]);
         i += 2;
         for (int j = 0; j < partsSize; j++) {
-            int x = static_cast<int>(data[i]);
+            int x = std::atoi(&data[i]);
             i += 2;
-            int y = static_cast<int>(data[i]);
+            int y = std::atoi(&data[i]);
             i += 2;
             s.addPart(x,y);
             i += 2;
