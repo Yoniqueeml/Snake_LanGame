@@ -29,7 +29,6 @@ class socketHandler{
 public:
     socketHandler();
     void bindServer();
-    void sendData(int client_sd, const std::vector<char>& msg);
     std::vector<int> handleActivity();
     void setupClientDescriptors();
     void startServer();

@@ -332,14 +332,11 @@ void game::handleIOActivity(){
         else if(msg.find("init~~") != string::npos){
             LANSendFoodCoordinates(foodObj.getX() , foodObj.getY()) ;
             string name="", sight="";
-            int pos = msg.find("init~~");
             int i;
 
             for (i = 6; msg[i] != '~'; i++){
                 name+=msg[i];
             }
-
-            sight = msg[i+2];
 
             initConsoleScreen("off");
             system("clear");
@@ -389,20 +386,26 @@ int game::getSnakeIndexFromDescriptor(int sd){
         }
     }
 }
-std::vector<char> serializeSnakes(std::vector<snake> Snakes){
-    std::vector<char> data;
+std::string serializeSnakes(std::vector<snake> Snakes){
+    std::string data;
     for (auto const s : Snakes){
-        data.insert(data.end(), reinterpret_cast<const char*>(s.getId()),reinterpret_cast<const char*>(s.getId())+sizeof(s.getId()));
-        data.insert(data.end(), reinterpret_cast<const char*>(s.getDirection()),reinterpret_cast<const char*>(s.getDirection())+sizeof(s.getDirection()));
-        data.insert(data.end(), reinterpret_cast<const char*>(s.getBodyColor()),reinterpret_cast<const char*>(s.getBodyColor())+sizeof(s.getBodyColor()));
-        size_t partsSize = s.getParts().size();
-        data.insert(data.end(), reinterpret_cast<const char*>(&partsSize), reinterpret_cast<const char*>(&partsSize) + sizeof(partsSize));
+        data.push_back('=');
+        data.push_back(static_cast<char>(s.getId()));
+        data.push_back('#');
+        data.push_back(static_cast<char>(s.getDirection()));
+        data.push_back('#');
+        data.push_back(static_cast<char>(s.getBodyColor()));
+        data.push_back('#');
+        data.push_back(static_cast<char>(s.getParts().size()));
+        data.push_back('#');
         for (const auto& part : s.getParts()){
-            data.insert(data.end(),reinterpret_cast<const char*>(part.getX()), reinterpret_cast<const char*>(part.getX())+sizeof(part.getX()));
-            data.insert(data.end(),reinterpret_cast<const char*>(part.getY()), reinterpret_cast<const char*>(part.getY())+sizeof(part.getY()));
+            data.push_back(static_cast<char>(part.getX()));
+            data.push_back('#');
+            data.push_back(static_cast<char>(part.getY()));
+            data.push_back('#');
         }
-        data.insert(data.end(),'==');
     }
+    data.push_back('?');
     return data;
 }
 void game::handleActivity(){
@@ -412,7 +415,7 @@ void game::handleActivity(){
         handleNewConnection();
     }
     else handleIOActivity();
-    std::vector<char> serializedSnakes = serializeSnakes(allSnakes);
+    std::string serializedSnakes = serializeSnakes(allSnakes);
     for (int temp= 0; temp < allSnakes.size(); temp++){
         int sd  = allSnakes[temp].getSocketDescriptor();
         if (sd > 0){

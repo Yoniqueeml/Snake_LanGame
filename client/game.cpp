@@ -67,50 +67,34 @@ void game::setFoodPos(int x, int y){
     foodObj.setX(x);
     foodObj.setY(y);
 }
-vector<string> splitString(const string& str, const string& delimiter) {
-    vector<string> result;
-    size_t start = 0;
-    size_t end = str.find(delimiter);
 
-    while (end != string::npos) {
-        result.push_back(str.substr(start, end - start));
-        start = end + delimiter.length();
-        end = str.find(delimiter, start);
+std::vector<snake> deserializeSnakes(const std::string& data) {
+    std::vector<snake> Snakes;
+    int i = 0;
+    while (data[i]!='?') {
+        if (data[i] != '=') {
+            return {};
+        }
+        i += 1;
+        snake s(static_cast<int>(data[i]));
+        i += 2;
+        s.setBodyColor(static_cast<int>(data[i]));
+        i += 2;
+        int partsSize = static_cast<int>(data[i]);
+        i += 2;
+        for (int j = 0; j < partsSize; j++) {
+            int x = static_cast<int>(data[i]);
+            i += 2;
+            int y = static_cast<int>(data[i]);
+            i += 2;
+            s.addPart(x,y);
+            i += 2;
+        }
+        Snakes.push_back(s);
     }
+    return Snakes;
+}
 
-    result.push_back(str.substr(start));
-    return result;
-}
-snake deserializeSnake(const string& snakeStr) {
-    size_t offset = 0;
-    int id;
-    std::memcpy(&id, snakeStr.data() + offset, sizeof(id));
-    offset += sizeof(id);
-    snake deserializedSnake(id);
-    int direction;
-    std::memcpy(&direction, snakeStr.data() + offset, sizeof(direction));
-    deserializedSnake.setDirection(direction);
-    offset += sizeof(direction);
-    int bodyColor;
-    std::memcpy(&bodyColor, snakeStr.data() + offset, sizeof(bodyColor));
-    deserializedSnake.setBodyColor(bodyColor);
-    offset += sizeof(bodyColor);
-    size_t partsSize;
-    std::memcpy(&partsSize, snakeStr.data() + offset, sizeof(partsSize));
-    offset += sizeof(partsSize);
-    std::vector<snake_part> parts;
-    for (size_t i = 0; i < partsSize; i++) {
-        int x, y;
-        std::memcpy(&x, snakeStr.data() + offset, sizeof(x));
-        offset += sizeof(x);
-        std::memcpy(&y, snakeStr.data() + offset, sizeof(y));
-        offset += sizeof(y);
-        snake_part part(x, y);
-        parts.push_back(part);
-    }
-    deserializedSnake.setParts(parts);
-    return deserializedSnake;
-}
 void game::handleMessageFromServer(string msg){
     if (msg.find(":") != string::npos){
         int start_colon = msg.find(":");
@@ -134,11 +118,9 @@ void game::handleMessageFromServer(string msg){
         mainSnakePtr->setScore(stoi(num));
         gameOverHandler(*mainSnakePtr);
     }
-    if (msg.find("==") != string::npos) {
-        vector<string> snakeData = splitString(msg, "==");
-        for (const string& snakeStr : snakeData) {
-            snake deserializedSnake = deserializeSnake(snakeStr);
-        }
+    if (msg.find("=") != string::npos) {
+        std::vector<snake> viewSnakes;
+        viewSnakes = deserializeSnakes(msg);
     }
 }
 

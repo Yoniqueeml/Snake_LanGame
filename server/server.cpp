@@ -146,9 +146,6 @@ std::string socketHandler::handleIOActivity(int client_sd){
 void socketHandler::sendData(int client_sd , std::string msg){
     send(client_sd, msg.c_str(), msg.length(), 0);
 }
-void socketHandler::sendData(int client_sd, const std::vector<char>& msg) {
-    send(client_sd, msg.data(), msg.size(), 0);
-}
 
 std::vector<int> socketHandler::handleActivity(){
     std::vector<int> descriptors;

@@ -27,10 +27,6 @@ int snake::getBodyColor() const{
     return bodyColor;
 }
 
-void snake::addPart(int x, int y){
-    snake_part obj(x, y);
-    parts.push_back(obj);
-}
 
 int snake::setScore(int s){
     score = s;
