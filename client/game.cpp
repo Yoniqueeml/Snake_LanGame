@@ -79,6 +79,7 @@ std::vector<snake> deserializeSnakes(const std::string& data) {
         snake s(std::atoi(&data[i]));
         i += 2;
         s.setBodyColor(std::atoi(&data[i]));
+        std::ofstream out;
         i += 2;
         int partsSize = std::atoi(&data[i]);
         i += 2;
