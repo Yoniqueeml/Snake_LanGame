@@ -17,6 +17,8 @@ private:
 
     socketHandler server;
     vector<int> clients;
+
+    int prevClientId = 0;
 public:
     vector <snake> allSnakes;
 

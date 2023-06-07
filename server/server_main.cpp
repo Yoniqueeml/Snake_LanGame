@@ -48,7 +48,7 @@ void signalHandler(int code){
     }
 }
 
-int main(int argc , char * argv[]){
+int main(int argc, char * argv[]){
     GameObj.showInitialChoices();
 
     signal(SIGINT, signalHandler);
@@ -57,7 +57,7 @@ int main(int argc , char * argv[]){
 
     GameObj.initServerForMultiplayer();
 
-    while(true){
+    while (true){
         GameObj.resetMaxScreen();
         activity = GameObj.checkClientActivity();
 

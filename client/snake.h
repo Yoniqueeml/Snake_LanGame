@@ -26,7 +26,7 @@ public:
     void setDirection(int);
     int getScore() const;
     int getBodyColor() const;
-    void setBodyColor(int bodyColor) {this->bodyColor = bodyColor;}
+    void setBodyColor(int bodyColor);
     int setScore(int s);
     void addPart(int x, int y){
         snake_part obj(x,y);
@@ -35,6 +35,8 @@ public:
     const vector<snake_part>& getParts() const;
     vector<snake_part>& getParts();
     const snake_part& getPart(const int) const;
-    void setParts(const std::vector<snake_part> _parts){ parts = _parts;}
+    void setParts(std::vector<snake_part> newParts);
     string getName() const;
+    void setId(int);
+    int getId() const;
 };

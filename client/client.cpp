@@ -9,9 +9,9 @@
 
 #include "game.h"
 
-using namespace std ;
+using namespace std;
 
-game GameObj(1) ;
+game GameObj(1);
 
 void HANDLE_EVERYTHING_TILL_EVENT_LOOP(){
     srand(time(NULL));
@@ -30,7 +30,7 @@ void signalHandler(int code){
     GameObj.initConsoleScreen("off");
     GameObj.printAnimated("\nBye!", 6000);
     GameObj.getSockObj().closeSocket();
-    exit(1) ;
+    exit(1);
 }
 
 struct inputEvent {
@@ -41,14 +41,13 @@ struct inputEvent {
 };
 
 int main(){
-    int fd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK);
+    int fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
     if (fd < 0){
         std::cout << "Error keyboard logging" << std::endl;
         throw "Error keyboard logging";
     }
 
     signal(SIGINT, signalHandler);
-    signal(SIGWINCH, signalHandler);
     srand(time(NULL));
     system("clear");
     string serverAddress, player_name;
@@ -100,7 +99,7 @@ int main(){
         flushinp();
         clear();
         GameObj.drawBorderWindow();
-        GameObj.moveSnake(first_snake, first_snake.getDirection());
+        GameObj.moveMainSnake(first_snake, first_snake.getDirection());
         GameObj.drawAllSnakes();
         GameObj.moveAllSnakes();
         GameObj.printFood("old");

@@ -35,7 +35,7 @@ void game::setMainSnakePtr(snake* ptr){
 }
 
 void game::printFood(string status){
-    if (status=="new")
+    if (status == "new")
         generateFood();
 
     if (!getFoodX() && !getFoodY())
@@ -68,27 +68,25 @@ void game::setFoodPos(int x, int y){
     foodObj.setY(y);
 }
 
-std::vector<snake> deserializeSnakes(const std::string& data) {
+std::vector<snake> deserializeSnakes(const int startInd, const std::string& data) {
     std::vector<snake> Snakes;
-    int i = 0;
-    while (data[i]!='?') {
-        if (data[i] != '=') {
-            return {};
-        }
+    int i = startInd;
+    while (data[i] != ')') {
         i += 1;
-        snake s(std::atoi(&data[i]));
-        i += 2;
-        s.setBodyColor(std::atoi(&data[i]));
-        i += 2;
-        int partsSize = std::atoi(&data[i]);
-        i += 2;
+        snake s((int)(data[i] - '0'));
+        i += 1;
+        s.setDirection(data[i] - '0');
+        i += 1;
+        s.setBodyColor((int)(data[i] - '0'));
+        i += 1;
+        int partsSize = (int)(data[i] - '0');
+        i += 1;
         for (int j = 0; j < partsSize; j++) {
-            int x = std::atoi(&data[i]);
-            i += 2;
-            int y = std::atoi(&data[i]);
-            i += 2;
-            s.addPart(x,y);
-            i += 2;
+            int x = int(data[i] - '0');
+            i += 1;
+            int y = int(data[i] - '0');
+            i += 1;
+            s.addPart(x, y);
         }
         Snakes.push_back(s);
     }
@@ -96,12 +94,12 @@ std::vector<snake> deserializeSnakes(const std::string& data) {
 }
 
 void game::handleMessageFromServer(string msg){
-    if (msg.find(":") != string::npos){
-        int start_colon = msg.find(":");
+    if (msg.find("!") != string::npos){
+        int start_colon = msg.find("!");
 
         int camma = msg.find(",");
         string str_x = msg.substr(start_colon + 1 , camma - 1);
-        string str_y = msg.substr(camma+1, 3);
+        string str_y = msg.substr(camma + 1, 3);
 
         int x  = stoi(str_x), y = stoi(str_y);
 
@@ -109,7 +107,7 @@ void game::handleMessageFromServer(string msg){
     }
 
     //Handle game over message sent from server
-    if (msg.find("$")!=string::npos){
+    if (msg.find("$") != string::npos){
         int start = msg.find("$");
         string num = "";
         for (int i = start + 1; msg[i] != '$'; i++){
@@ -118,8 +116,13 @@ void game::handleMessageFromServer(string msg){
         mainSnakePtr->setScore(stoi(num));
         gameOverHandler(*mainSnakePtr);
     }
-    if (msg.find("=") != string::npos) {
-        allSnakes = deserializeSnakes(msg);
+
+    if (msg.find("(") != string::npos) {
+        allSnakes = deserializeSnakes(msg.find("("), msg);
+    }
+
+    if (msg.find("+") != string::npos){
+        mainSnakePtr->setId(atoi(&msg[msg.find("+") + 1]));
     }
 }
 
@@ -214,8 +217,8 @@ void game::gameOverHandler(const snake& snk){
 
 void game::printScore(const snake& snk, string pos){
     if (pos == "right")
-        mvprintw(0, 15, "Score = %d", snk.getScore());
-    mvprintw(0, 0, "Score = %d", snk.getScore());
+        mvprintw(0, 15, "Score = %d:%d", snk.getScore(), snk.getId());
+    mvprintw(0, 0, "Score = %d:%d", snk.getScore(), snk.getId());
 }
 
 void game::drawSnake(const snake& snk){
@@ -230,10 +233,9 @@ void game::drawSnake(const snake& snk){
 
 void game::drawAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
-        allSnakes[i].addPart(centerX + 5 , centerY);
-        allSnakes[i].addPart(centerX + 6 , centerY);
-        allSnakes[i].addPart(centerX + 7 , centerY);
-        drawSnake(allSnakes[i]);
+        if (allSnakes[i].getId() != mainSnakePtr->getId()) {
+            drawSnake(allSnakes[i]);
+        }
     }
 }
 
@@ -266,15 +268,42 @@ void game::moveSnake(snake& snk, int direction){
         snk.setDirection(3);
     }
 
+    if (snk.getId() != mainSnakePtr->getId())
+        drawSnake(snk);
+    refresh();
+}
+
+void game::moveMainSnake(snake& snk, int direction){
+    snk.getParts().erase(snk.getParts().begin());
+    snake_part last_part = snk.getParts().at(snk.getParts().size() - 1);
+
+    if (direction == 2){
+        snk.addPart(last_part.getX() % (maxX - 1) + 1, last_part.getY());
+        snk.setDirection(2);
+    }
+    else if (direction == 0){
+        snk.addPart((last_part.getX() - 1) < 1 ? maxX - 2 :(last_part.getX() - 1), last_part.getY());
+        snk.setDirection(0);
+    }
+    else if (direction == 1){
+        snk.addPart(last_part.getX() , (last_part.getY() - 1) < 1 ? maxY - 2:(last_part.getY() - 1));
+        snk.setDirection(1);
+    }
+    else if (direction == 3){
+        snk.addPart(last_part.getX(), last_part.getY() % (maxY - 1) + 1);
+        snk.setDirection(3);
+    }
+
     checkSnakeOverlap(snk);
 
-    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
+    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && &snk == mainSnakePtr){
         snk.addPart(getFoodX(), getFoodY());
         snk.setScore(snk.getScore() + 1);
         sockObj.sendData("#");
 
         setFoodPos(-10, -10);
     }
+
     drawSnake(snk);
     refresh();
 }

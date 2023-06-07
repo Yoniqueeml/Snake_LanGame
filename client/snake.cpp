@@ -50,3 +50,19 @@ const snake_part& snake::getPart(const int i) const{
 string snake::getName() const{
     return playerName;
 }
+
+void snake::setBodyColor(int bodyColor){
+    this->bodyColor = bodyColor;
+}
+
+void snake::setId(int newId){
+    this->id = newId;
+}
+
+void snake::setParts(const std::vector<snake_part> newParts){
+    this->parts = newParts;
+}
+
+int snake::getId() const {
+    return id;
+}

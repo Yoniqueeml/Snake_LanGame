@@ -41,6 +41,7 @@ public:
     void drawAllSnakes();
     void initSnakeOnScreen(snake&);
     void moveSnake(snake&, int);
+    void moveMainSnake(snake&, int);
     void moveAllSnakes();
     void handleMovementKeyPress(snake&, int);
     void checkSnakeOverlap(snake&);

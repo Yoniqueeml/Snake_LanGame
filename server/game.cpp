@@ -230,7 +230,7 @@ void game::printScores(){
     coloron(WHITE);
     for (int i = 0; i < allSnakes.size(); i++){
         temp = allSnakes[i].getName();
-        mvprintw(0 , s, "%s:%d", temp.c_str(), allSnakes[i].getScore());
+        mvprintw(0 , s, "%s:%d:%d", temp.c_str(), allSnakes[i].getScore(), allSnakes[i].getId());
         s += temp.length() + 4;
     }
     coloroff(WHITE);
@@ -290,7 +290,7 @@ void game::LANSendFoodCoordinates(int x, int y){
 
         if (sd > 0){
             char foodcoord[20];
-            sprintf(foodcoord, ":%03d,%03d", x, y);
+            sprintf(foodcoord, "!%03d,%03d", x, y);
             server.sendData(sd, string(foodcoord));
         }
     }
@@ -304,7 +304,7 @@ void game::initServerForMultiplayer(){
 
 void game::handleNewConnection(){
     int client_socket = server.handleNewConnection();
-    snake * clientSnakePtr = new snake(0, client_socket);
+    snake* clientSnakePtr = new snake(prevClientId++, client_socket);
     allSnakes.push_back(*clientSnakePtr);
     setNoOfPlayers(getNoOfPlayers() + 1);
 
@@ -312,13 +312,16 @@ void game::handleNewConnection(){
     allSnakes[allSnakes.size() - 1].addPart(centerX + 6, centerY);
     allSnakes[allSnakes.size() - 1].addPart(centerX + 7, centerY);
     generateFood();
+    string msg = "+";
+    msg += to_string(clientSnakePtr -> getId());
+    server.sendData(client_socket, msg);
 }
 
 void game::syncSnakeWithClient(snake& clientsnake){
     int x_diff = getFoodX() - clientsnake.getHeadX();
     int y_diff = getFoodY() - clientsnake.getHeadY();
 
-    for(int i = 0 ; i < clientsnake.getParts().size(); i++){
+    for (int i = 0; i < clientsnake.getParts().size(); i++){
         clientsnake.getPart(i).setX(clientsnake.getPart(i).getX() + x_diff);
         clientsnake.getPart(i).setY(clientsnake.getPart(i).getY() + y_diff);
     }
@@ -405,25 +408,20 @@ int game::getSnakeIndexFromDescriptor(int sd){
 std::string serializeSnakes(std::vector<snake> Snakes){
     std::string data;
     for (auto const s : Snakes){
-        data.push_back('=');
-        data += std::to_string(s.getId());
-        data.push_back('#');
-        data += std::to_string(s.getDirection());
-        data.push_back('#');
-        data += std::to_string(s.getBodyColor());
-        data.push_back('#');
-        data += std::to_string(s.getParts().size());
-        data.push_back('#');
+        data.push_back('(');
+        data += char('0' + s.getId());
+        data += char('0' + s.getDirection());
+        data += char('0' + s.getBodyColor());
+        data += char('0' + s.getParts().size());
         for (const auto& part : s.getParts()){
-            data += std::to_string(part.getX());
-            data.push_back('#');
-            data += std::to_string(part.getY());
-            data.push_back('#');
+            data += char('0' + part.getX());
+            data += char('0' + part.getY());
         }
     }
-    data.push_back('?');
+    data.push_back(')');
     return data;
 }
+
 void game::handleActivity(){
     clients = server.handleActivity();
 
