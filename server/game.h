@@ -12,8 +12,8 @@ private:
     food foodObj;
     int centerX, centerY;
 
-    const int maxX = 120;
-    const int maxY = 40;
+    const int maxX = 80;
+    const int maxY = 30;
 
     socketHandler server;
     vector<int> clients;
@@ -27,6 +27,7 @@ public:
     int getSnakeIndexFromDescriptor(int);
 
     void showInitialChoices();
+    void sendSnakes();
     void syncSnakeWithClient(snake &);
     int getSnakeIndexFromID(int);
     void resetMaxScreen();
@@ -63,4 +64,3 @@ public:
     socketHandler& getServer();
     void drawBorderWindow();
 };
-

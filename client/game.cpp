@@ -1,3 +1,4 @@
+
 #include "game.h"
 
 #include <ncurses.h>
@@ -74,8 +75,6 @@ std::vector<snake> deserializeSnakes(const int startInd, const std::string& data
     while (data[i] != ')') {
         i += 1;
         snake s((int)(data[i] - '0'));
-        i += 1;
-        s.setDirection(data[i] - '0');
         i += 1;
         s.setBodyColor((int)(data[i] - '0'));
         i += 1;
@@ -234,9 +233,7 @@ void game::drawSnake(const snake& snk){
 
 void game::drawAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
-        if (allSnakes[i].getId() != mainSnakePtr->getId()) {
-            drawSnake(allSnakes[i]);
-        }
+        drawSnake(allSnakes[i]);
     }
 }
 
@@ -311,7 +308,9 @@ void game::moveMainSnake(snake& snk, int direction){
 
 void game::moveAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
-        moveSnake(allSnakes[i], allSnakes[i].getDirection());
+        if (allSnakes[i].getId() != mainSnakePtr->getId()) {
+            drawSnake(allSnakes[i]);
+        }
     }
 }
 void game::handleMovementKeyPress(snake& snk, const int code){
@@ -344,7 +343,7 @@ void game::checkSnakeOverlap(snake& snk){
         }
 }
 
-void game::readData(){
+int game::readData(){
     int val;
     FD_ZERO(&sockObj.getSet());
     FD_SET(sockObj.getSock(), &sockObj.getSet());
@@ -354,11 +353,14 @@ void game::readData(){
     if(val > 0){
         recv(sockObj.getSock(), sockObj.getBuffer(), 1024, 0);
         handleMessageFromServer(string(sockObj.getBuffer()));
+        return 1;
     }
 
     else if(val == -1){
         perror("select");
+        return 0;
     }
+    return 0;
 }
 
 void game::drawBorderWindow(){

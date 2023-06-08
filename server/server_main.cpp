@@ -75,7 +75,7 @@ int main(int argc, char * argv[]){
 
         GameObj.printFood("old");
         refresh();
+        GameObj.sendSnakes();
         usleep(70000);
-
     }
 }
