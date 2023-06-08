@@ -41,7 +41,7 @@ struct inputEvent {
 };
 
 int main(){
-    int fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
+    int fd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK);
     if (fd < 0){
         std::cout << "Error keyboard logging" << std::endl;
         throw "Error keyboard logging";
@@ -100,7 +100,6 @@ int main(){
         clear();
         GameObj.drawBorderWindow();
         GameObj.moveMainSnake(first_snake, first_snake.getDirection());
-        GameObj.drawAllSnakes();
         GameObj.moveAllSnakes();
         GameObj.printFood("old");
         GameObj.printScore(first_snake);
