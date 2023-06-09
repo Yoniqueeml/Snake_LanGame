@@ -48,6 +48,9 @@ void signalHandler(int code){
     }
 }
 
+const int TICK_TIME = 1000;
+const int STEP_TIME = 50 * TICK_TIME;
+
 int main(int argc, char * argv[]){
     GameObj.showInitialChoices();
 
@@ -56,26 +59,31 @@ int main(int argc, char * argv[]){
     int activity;
 
     GameObj.initServerForMultiplayer();
+    int iter = 0;
 
     while (true){
-        GameObj.resetMaxScreen();
         activity = GameObj.checkClientActivity();
 
         if (activity >= 1){
             GameObj.handleActivity();
         }
+        usleep(TICK_TIME);
+        iter += 1;
 
+        if (iter == 30) {
+            GameObj.resetMaxScreen();
+            flushinp();
+            clear();
 
-        flushinp();
-        clear();
+            GameObj.drawBorderWindow();
+            GameObj.moveAllSnakes();
+            GameObj.printScores();
 
-        GameObj.drawBorderWindow();
-        GameObj.moveAllSnakes();
-        GameObj.printScores();
-
-        GameObj.printFood("old");
-        refresh();
-        usleep(70000);
+            GameObj.printFood("old");
+            refresh();
+            iter = 0;
+            usleep(TICK_TIME);
+        }
 
     }
 }

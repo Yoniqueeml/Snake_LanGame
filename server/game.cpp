@@ -169,11 +169,11 @@ void game::moveSnake(snake& snk, int direction){
 
     checkSnakeOverlap(snk);
 
-    //if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
-    //    snk.addPart(getFoodX(), getFoodY());
-    //    snk.setScore(snk.getScore() + 1);
-    //    printFood("new");
-    //}
+    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY()){
+        snk.addPart(getFoodX(), getFoodY());
+        snk.setScore(snk.getScore() + 1);
+        printFood("new");
+    }
 
     drawSnake(snk);
     refresh();
@@ -182,6 +182,14 @@ void game::moveSnake(snake& snk, int direction){
 void game::moveAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
         moveSnake(allSnakes[i], allSnakes[i].getDirection());
+    }
+
+    std::string serializedSnakes = serializeSnakes();
+    for (int temp= 0; temp < allSnakes.size(); temp++){
+        int sd  = allSnakes[temp].getSocketDescriptor();
+        if (sd > 0){
+            server.sendData(sd, serializedSnakes);
+        }
     }
 }
 
@@ -405,9 +413,9 @@ int game::getSnakeIndexFromDescriptor(int sd){
         }
     }
 }
-std::string serializeSnakes(std::vector<snake> Snakes){
+std::string game::serializeSnakes() const{
     std::string data;
-    for (auto const s : Snakes){
+    for (auto const s : allSnakes){
         data.push_back('(');
         data += char('0' + s.getId());
         data += char('0' + s.getDirection());
@@ -429,13 +437,6 @@ void game::handleActivity(){
         handleNewConnection();
     }
     else handleIOActivity();
-    std::string serializedSnakes = serializeSnakes(allSnakes);
-    for (int temp= 0; temp < allSnakes.size(); temp++){
-        int sd  = allSnakes[temp].getSocketDescriptor();
-        if (sd > 0){
-            server.sendData(sd, serializedSnakes);
-        }
-    }
 }
 
 int game::checkClientActivity(){

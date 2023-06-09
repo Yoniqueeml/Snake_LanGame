@@ -11,8 +11,8 @@ private:
 
     int socketDescriptor = -1;
 
-    const int maxX = 120;
-    const int maxY = 40;
+    const int maxX = 80;
+    const int maxY = 30;
 
     SocketHandler sockObj;
 public:

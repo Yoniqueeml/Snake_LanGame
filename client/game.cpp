@@ -234,9 +234,9 @@ void game::drawSnake(const snake& snk){
 
 void game::drawAllSnakes(){
     for (int i = 0; i < allSnakes.size(); i++){
-        if (allSnakes[i].getId() != mainSnakePtr->getId()) {
-            drawSnake(allSnakes[i]);
-        }
+        //if (allSnakes[i].getId() != mainSnakePtr->getId()) {
+        drawSnake(allSnakes[i]);
+        //}
     }
 }
 
@@ -269,8 +269,14 @@ void game::moveSnake(snake& snk, int direction){
         snk.setDirection(3);
     }
 
-    if (snk.getId() != mainSnakePtr->getId())
-        drawSnake(snk);
+    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && snk.getId() == mainSnakePtr->getId()){
+        snk.addPart(getFoodX(), getFoodY());
+        snk.setScore(snk.getScore() + 1);
+        sockObj.sendData("#");
+        setFoodPos(-10, -10);
+    }
+
+    drawSnake(snk);
     refresh();
 }
 
@@ -297,16 +303,15 @@ void game::moveMainSnake(snake& snk, int direction){
 
     checkSnakeOverlap(snk);
 
-    if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && snk.getId() == mainSnakePtr->getId()){
-        snk.addPart(getFoodX(), getFoodY());
-        snk.setScore(snk.getScore() + 1);
-        sockObj.sendData("#");
+    //if (snk.getHeadX() == getFoodX() && snk.getHeadY() == getFoodY() && snk.getId() == mainSnakePtr->getId()){
+    //    snk.addPart(getFoodX(), getFoodY());
+    //    snk.setScore(snk.getScore() + 1);
+    //    sockObj.sendData("#");
+    //    setFoodPos(-10, -10);
+    //}
 
-        setFoodPos(-10, -10);
-    }
-
-    drawSnake(snk);
-    refresh();
+    //drawSnake(snk);
+    //refresh();
 }
 
 void game::moveAllSnakes(){
@@ -314,6 +319,7 @@ void game::moveAllSnakes(){
         moveSnake(allSnakes[i], allSnakes[i].getDirection());
     }
 }
+
 void game::handleMovementKeyPress(snake& snk, const int code){
     if (code == 17 || code == 103){
         if (snk.getDirection() != 3 && snk.getDirection() != 1)
